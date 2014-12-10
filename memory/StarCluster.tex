@@ -108,7 +108,7 @@ Los métodos más comunes de interpolar una imagen son los siguientes:
   \centering
     \includegraphics[width=0.5\textwidth]{img/example.png}
   \caption{Resultados obtenidos al emplear distintas interpolaciones. De izquierda a derecha y de arriba a abajo:
-  a) imagen original, b) zoom 10x interpolación por vecino más próximo, c)zoom 10x interpolación bilineal, d) zoom 10x interpolación bicúbica.}
+  a) imagen original, b) zoom 10x interpolación por vecino más próximo, c) zoom 10x interpolación bilineal, d) zoom 10x interpolación bicúbica.}
   \label{fig:interpolationExample}
 \end{figure}
 
@@ -374,6 +374,25 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 %% Seccion final del documento %%
 %%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+\section{Creación de un cluster en Amazon EC2 con StarCluster}
+	En el apartados anteriores vimos que hay programas que se puede paralelizar y que se pueden obtener mejoras de tiempo con su ejecución paralela, pero que su ejecución debe de ser de manera ordenada para que no todos los trabajos se ejecuten a la vez y sobrecarguen la máquina.
+
+	El objetivo de este trabajo es poder implementar un servicio de colas similar al que se puede acceder a las máquinas del CESGA. Estas colas son  sistemas de acceso ordenado de los distintos trabajos a los recursos de un servidor, de tal manera que su finalidad es permitir que los recursos se compartan de forma equitativa entre todos los usuarios y que el servidor no se sobrecargue intentando ejecutar todos los programas a la vez. Cundo los trabajos que se encuentran en cola exceden los recursos disponibles en el servidor, un número determinado de los mismos pueden entrar en ejecución, mientras que el resto debe esperar a que tenga suficientes recursos disponibles.
+
+	Para conseguir este objetivo se usará StarCluster el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube adecuado para programas distribuidos y paralelos.
+	
+\subsection{Instalando StarCluster}
+	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo y instalar StarCluster basta con introducir en la terminal los siguientes comandos:
+\begin{lstlisting}[style=minibash]
+$ curl -O https://pypi.python.org/packages/source/S/StarCluster/StarCluster-0.95.6.tar.gz
+$ tar xvzf StarCluster-0.95.6.tar.gz
+$ rm StarCluster-0.95.6.tar.gz
+$ cd StarCluster-0.95.6
+$ sudo python distribute_setup.py
+$ sudo python setup.py install
+\end{lstlisting}
 
 \clearpage
 
