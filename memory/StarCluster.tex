@@ -317,4 +317,67 @@ void fill_aux_begin(int *fill, int size, int bytes) {
 \label{cod:fill_to_MPI}
 \end{figure}
 
+\clearpage
+
+\section{Ejecución del  programa paralelo en local}
+	Para empezar a ver los beneficios de la paralelización se puede ejecutar el programa en cualquier ordenador personal\footnote{Es necesario que tenga un procesador multicore para que se pueda apreciar la diferencia de tiempos}. La máquina en la que se va a probar tiene un procesador Intel Core i7-4820k\footnote{\url{http://ark.intel.com/es-es/products/77781/Intel-Core-i7-4820K-Processor-10M-Cache-up-to-3_90-GHz}} de 4 núcleos en el que está montado un sistema operativo Ubuntu 14.04.
+	
+	Lo primero que tenemos que hacer es instalar un versión de MPI
+\begin{lstlisting}[style=minibash]
+$ wget http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.3.tar.gz
+$ tar -xvf openmpi-1.8.3.tar.gz
+$ cd openmpi-1.8.3
+$ ./configure --prefix="/home/$USER/.openmpi
+$ make; sudo make install
+$ echo 'export PATH=$PATH:/home/$USER/.openmpi/bin' >> /home/$USER/.bashrc
+$ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib' >> /home/$USER/.bashrc
+$ source /home/$USER/.bashrc
+\end{lstlisting}
+
+	Una vez que tenemos configurado el entorno para ejecutar los programas en paralelo procedemos a compilar el programa con la siguiente instrucción
+\begin{lstlisting}[style=minibash]
+$ mpicc paralelizado.c -lm -O3
+\end{lstlisting}
+	Y con eso podremos ejecutarlo indicando el número de procesos que se quieren emplear, que en este caso irá de 1 hasta 4.
+\begin{lstlisting}[style=minibash]
+$ mpirun -np 1 ./a.out 1500 1500 4 4
+$ mpirun -np 2 ./a.out 1500 1500 4 4
+$ mpirun -np 3 ./a.out 1500 1500 4 4
+$ mpirun -np 4 ./a.out 1500 1500 4 4
+\end{lstlisting}
+
+	Los resultados obtenidos son los que aparecen en la tabla \ref{tab:resultadosLocal} en donde al ejecutar con más de un proceso se puede ver que no se consigue un 100\% en la eficiencia (debido a la comunicaciones entre procesos), pero podemos ver tanto en el tiempo como en el \textit{speedup} que merece la pena ejecutarse de manera paralelizada.
+	
+\begin{table}[h]
+	\begin{center}
+		\caption{Resultados de ejecutar el programa paralelo en local con 1, 2, 3 y 4 procesos.}
+		\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Procesos} &
+\textbf{Tiempo} &
+\textbf{Speedup} &
+\textbf{Eficiencia} \\ \hline
+\hline
+1 & 126,81 sg & 1          & 100\% \\ \hline
+2 & 63,608 sg & 1,9936 & 99,68\% \\ \hline
+3 & 43,286 sg & 2,9295 & 97,65\% \\ \hline
+4 & 32,582 sg & 3,8920 & 97,30\% \\ \hline
+		\end{tabular}
+		\label{tab:resultadosLocal}
+	\end{center}
+\end{table}
+
+	Aunque esta manera de ejecutar los programas es válida, podría darse el caso de querer lanzar más programas a la vez y el resultado de los tiempos podría no ser adecuado debido a que cada core del procesador tendría que repartir su tiempo de ejecución entre varios procesos de tal manera que los tiempos no serían realistas. Además no se estaría aprovechando una de las características que nos ofrece MPI, el poder ejecutar un mismo programa en varias máquinas para sumar potencia de cálculo.
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%
+%% Seccion final del documento %%
+%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\clearpage
+
+{\setlength{\parskip}{0mm} \listoftables } % Para que no ponga espacios entre las lineas de indice
+{\setlength{\parskip}{0mm} \listoffigures} % Para que no ponga espacios entre las lineas de indice
+
 \end{document}
