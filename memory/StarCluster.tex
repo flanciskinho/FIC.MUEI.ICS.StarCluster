@@ -394,9 +394,200 @@ $ sudo python distribute_setup.py
 $ sudo python setup.py install
 \end{lstlisting}
 
+\subsection{Creando el archivo de configuración para StarCluster}
+	El primer paso para la creación de un cluster es definir un archivo de configuración en el que se podrán indicar todos los parámetros necesarios. Por defecto el archivo de configuración tiene que estar en \emph{\$HOME/.starcluster/config} pero se le puede cambiar la localización con la variable de entorno \emph{STARCLUSTER\_CONFIG}.
+\begin{lstlisting}[style=minibash]
+$ echo "export STARCLUSTER_CONFIG=\"$PWD/starclusterconfig\"" >> $HOME/.bash_profile 
+$ source $HOME/.bash_profile
+\end{lstlisting}
+
+Ahora procederemos a crear el archivo de configuración con el comando \emph{starcluster help} y como el fichero de configuración nos mostrará diferentes opciones. Nosotros pulsaremos la opción 2 para que nos cree un archivo de configuración por defecto donde indica la variable de entorno \emph{STARCLUSTER\_CONFIG}.
+\begin{lstlisting}[style=minibash]
+$ starcluster help
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+!!! ERROR - config file /Users/flanciskinho/Documents/Facultad/2014_2015/ICS/Practicas/05_Optativa/starclusterconfig does not exist
+
+Options:
+--------
+[1] Show the StarCluster config template
+[2] Write config template to /Users/flanciskinho/Documents/Facultad/2014_2015/ICS/Practicas/05_Optativa/starclusterconfig
+[q] Quit
+
+Please enter your selection: 2
+>>> Config template written to /Users/flanciskinho/Documents/Facultad/2014_2015/ICS/Practicas/05_Optativa/starclusterconfig
+>>> Please customize the config template
+\end{lstlisting} 
+
+	El primer paso que debemos hacer es la configuración de las credenciales de AWS en el fichero de configuración. Para ello dentro del archivo nos movemos a la sección \emph{[aws\_info]}. Las credenciales se han de indicar en los parámetros \emph{AWS\_ACCESS\_KEY\_ID}, \emph{AWS\_SECRET\_ACCESS\_KEY} y \emph{AWS\_USER\_ID}.
+	
+	Además de indicar las credenciales de AWS también tenemos que indicar el ``par de claves'' de Amazon EC2 en la sección [keypair] . Esto es necesario para que StarCluster se pueda conectar a las instancias y pueda configurarlas. se puede crear varias secciones de par de claves. En la siguiente sección de configuración se muestra un ejemplo de la configuración
+\begin{lstlisting}
+[key mykey1]
+ KEY_LOCATION=./Keypair_AWS/01-francisco-cedron-keypair.pem
+[key mykey2]
+ KEY_LOCATION=./Keypair_AWS/02-francisco-cedron-keypair.pem
+\end{lstlisting}
+
+	A pesar de que en la sección [aws\_info] se tienen que indicar la configuración de las credenciales de AWS, en esta sección se puede configurar más cosas como la región donde estarán las instancias o la región donde está el servicio de S3 para el almacenamiento. Para indicar la región donde se lanzaran las instancias hay que indicarlos con los parámetros \emph{aws\_region\_name} y \emph{aws\_region\_host} en la tabla \ref{tab:ec2-endpoint} se muestra como se deben modificar actualmente esos valores aunque en la dirección \url{http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region} aparece los valores más recientes que pueden tomar. Para indicar el lugar donde se aloja el servicio que se usará en Amazon S3 hay que modificar el parámetro \emph{aws\_s3\_host} con algunos de los valores de la tabla \ref{tab:s3-endpoint} aunque en la dirección \url{http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region} aparece los valores más recientes que pueden tomar. La opción que coge por defecto \emph{aws\_s3\_host} si no se especifica ningún valor es \emph{s3.amazonaws.com} que se usará la región del Norte de Virginia o la del Pacífico Noroeste.
+
+\begin{table}[h]
+	\begin{center}
+		\caption{Regiones disponibles para Amazon EC2.}
+		\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Lugar} &
+\textbf{aws\_region\_name} &
+\textbf{aws\_region\_host} \\ \hline
+\hline
+US East (N. Virgina)          & us-east-1          &  ec2.us-east-1.amazonaws.com \\ \hline
+US West (Oregon)             & us-west-2         &  ec2.us-west-2.amazonaws.com \\ \hline
+US West (N. California)      & us-west-1         &  ec2.us-west-1.amazonaws.com \\ \hline
+EU (Ireland)                       & eu-west-1         &  ec2.eu-west-1.amazonaws.com \\ \hline
+EU (Frankfurt)                   & eu-central-1      & ec2.eu-central-1.amazonaws.com \\ \hline
+Asia Pacific (Singapore)     & ap-southeast-1 & ec2.ap-southeast-1.amazonaws.com \\ \hline
+Asia Pacific (Sydney)         & ap-southeast-2 & ec2.ap-southeast-2.amazonaws.com \\ \hline
+Asia Pacific (Tokio)            & ap-northeast-1 & ec2.ap-northeast-1.amazonaws.com \\ \hline
+South America (Sao Paulo) & sa-east-1         & ec2.as-east-1.amazonaws.com \\ \hline
+		\end{tabular}
+		\label{tab:ec2-endpoint}
+	\end{center}
+\end{table}
+
+\begin{table}[h]
+	\begin{center}
+		\caption{Regiones disponibles para Amazon S3.}
+		\begin{tabular}{|l|c|}
+\hline
+\textbf{Lugar} &
+\textbf{aws\_s3\_host} \\ \hline
+\hline
+US West (Oregon)            &  s3-us-west-2.amazonaws.com \\ \hline
+US West (N. California)     &  s3-us-west-1.amazonaws.com \\ \hline
+EU (Ireland)                       &  s3-eu-west-1.amazonaws.com \\ \hline
+EU (Frankfurt)                   & s3-eu-central-1.amazonaws.com \\ \hline
+Asia Pacific (Singapore)     & s3-ap-southeast-1.amazonaws.com \\ \hline
+Asia Pacific (Sydney)         & s3-ap-southeast-2.amazonaws.com \\ \hline
+Asia Pacific (Tokio)            & s3-ap-northeast-1.amazonaws.com \\ \hline
+South America (Sao Paulo) & s3-as-east-1.amazonaws.com \\ \hline
+		\end{tabular}
+		\label{tab:s3-endpoint}
+	\end{center}
+\end{table}
+
+	Dentro de la sección de [aws\_info] también se puede especificar la configuración de para usar un proxy para conectarse a AWS. Para ello hay que incluir los siguientes parámetros
+{\setlength{\parskip}{0mm} \begin{itemize}
+{\setlength{\parskip}{0mm}
+	\item 	\emph{aws\_proxy}: Es el nombre del host proxy que se empleara
+	\item 	\emph{aws\_proxy\_port}: Es el número de puerto que utilizará el proxy para conectarse
+	\item 	\emph{aws\_proxy\_user}: Es el nombre de usuario para utilizar cuando se autentique con el proxy
+	\item 	\emph{aws\_proxy\_pass}: Es el contraseña a usar cuando se autentica 
+}\end{itemize} }
+
+	Con StarCluster se pueden usar los volúmenes de Amazon EBS para dar almacenamiento persistente al cluster. Si se quieren usar los volúmenes EBS con StarCluster hay que definir la sección para \emph{[volume]} en el archivo de configuración para cada volumen que se quiera usar. En la siguiente sección del archivo de configuración se muestra un ejemplo:
+\begin{lstlisting}
+[volume voldata1]
+ volume_id=vol-c9999999
+ mount_path=/home
+[volume voldata2]
+volume_id=vol-c8888888
+mount_path=/scratch
+\end{lstlisting}
+
+	Cuando se inicia el cluster cada nodo se añade a un grupo de seguridad común que está creado por StarCluster y tiene un nombre de la forma @sc-\textbf{cluster\_tag} donde \textbf{cluster\_tag} es el nombre que se pasa por parametro al iniciar el cluster. Por defecto agrega un permiso para este grupo de seguridad que permite el acceso al puerto ssh (22) desde cualquier dirección ip. Esta regla es necesaria para que StarCluster pueda conectarse a las instancias y configurarlas. Si necesita añadir más reglas en el grupo de seguridad del cluster se puede hacer en el fichero de configuración en la sección [permission].  En la siguiente sección del archivo de configuración se muestra un ejemplo:
+\begin{lstlisting}
+[permission www]
+ from_port = 80
+to_port = 80
+[permission ftp]
+ from_port = 21
+to_port = 21
+cidr_ip = 66.249.90.104/32
+[permission range]
+from_port = 20
+to_port = 53
+\end{lstlisting}
+
+	Además también se tiene soporte para plugins\cite{SystemPlugin} que se puede especificar en la sección de [plugin].
+
+	Antes de crear un cluster con StarCluster sobre Amazon EC2, se tiene que especificar una plantilla que contenga toda la configuración necesaria para la creación del cluster. Para ello hay que crear una sección \emph{[cluster]} en el archivo de configuración. Una vez que tienes una plantilla definida para el cluster se pueden lanzar diversos clusters usando la misma plantilla. Las parámetros de configuración son los siguientes\footnote{Los parámetros que aparecen en negrita son obligatorios}:
+{\setlength{\parskip}{0mm} \begin{itemize}
+{\setlength{\parskip}{0mm}
+	\item 	\textbf{\emph{keyname}}: Es el ``par de claves'' que se usara para el cluster. Para ello tiene que estar definido en la seccion [keypair]
+	\item \textbf{\emph{cluster\_size}}: El número de nodos que tendrá el cluster (se incluye también el nodo maestro).
+	\item \textbf{\emph{node\_image\_id}}: El identificador del AMI que usaran los nodos de trabajo
+	\item \textbf{\emph{node\_instance\_type}}: Es el tipo de instancia que usaran los nodos de trabajo
+	\item \emph{cluster\_user}: El usuario que crear el cluster (por defecto es \emph{sgeadmin})
+	\item \emph{cluster\_shell}: El shell del cluster (por defecto es \emph{bash}, aunque las opciones que puedes especificar son \emph{bash}, \emph{zsh}, \emph{csh}, \emph{ksh}, \emph{tcsh})
+	\item \emph{dns\_prefix}: Si se especifica este valor el nombre dns de los nodos empezaran con el valor que se especifique aquí
+	\item \emph{master\_image\_id}: El identificador de la AMI que se usará para el nodo master (si no se especifica se usa el que se haya indicado en node\_image\_id)
+	\item \emph{master\_instance\_type}: Es el tipo de instancia que se usará para el nodo master (si no se especifica se usa el que se haya indicado en node\_instance\_type)
+	\item \emph{userdata\_scripts}: Lista e los scripts que se usarán cuando se lancen las instancias
+	\item \emph{volumes}: Lista de volúmenes EBS para adjuntar al servicio NFS compartido en el cluster (cada volumen tendrá que estar especificado en la sección [volumen])
+	\item \emph{plugin}: Lista de plugins para StarCluster a usar cuando se lance el cluster (cada plugin tiene que estar definido en la sección [plugin])
+	\item \emph{permissions}: Lista de permisos a aplicar al grupo de seguridad del cluster (cada permiso tendrá que estar especificado en la sección [permissions])
+	\item \emph{spot\_bid}: Usar siempre las instancias \textit{spot}\cite{SpotInstancesEC2} con esta plantilla del cluster
+	\item \emph{force\_spot\_master}: Por motivos de estabilidad el nodo master no es una instancia \textit{spot} pero con este parámetro se puede forzar a que lo sea
+	\item \emph{availability\_zone}: Lanza todas las instancias del cluster en una zona de disponibilidad (por defecto usa cualquier zona disponible)
+	\item \emph{dissable\_queue}: Desactiva la instalación y la configuración del \textit{Open Grid Scheduler}\cite{OpenGridScheduler}
+	\item \emph{dissable\_cloudinit}: No usa \emph{cloudinit}\cite{CloudInit} para las cuentas del cluster (solo requerido si se usa cloudinit)
+	\item \emph{subnet\_id}: La subred del VPC para usar cuando se lanzan las instancias del cluster
+	\item \emph{public\_ips}: Automáticamente asigna una dirección de IP pública a todas las instancias del cluster (por defecto es falso)
+}\end{itemize} }
+
+	StarCluster no limita a usar una única plantilla en el archivo de configuración permitiendo definir múltiples plantillas en el mismo archivo de configuración creando varias secciones [cluster]. Además como la definición de estas plantillas puede ser algo repetitivo es posible crear una plantilla a partir de la definición de otra. En la siguiente sección del archivo de configuración se muestra un ejemplo:
+\begin{lstlisting}
+[cluster proveCluster]
+keyname = mykeypair1
+cluster_size = 2
+cluster_user = sgeadmin
+cluster_shell = bash
+master_image_id = ami-0330d16a
+master_instance_type = m1.small
+node_image_id = ami-0330d16a
+node_instance_type = m1.small
+
+[cluster productionCluster]
+extends = proveCluster
+keyname = mykeypair2
+cluster_size = 10
+node_instance_type = c1.xlarge
+\end{lstlisting}
+	Como en el archivo de configuración se pueden tener varias plantillas de cluster es posible definir una como predeterminada que se hace en la sección [global] de la siguiente manera:
+\begin{lstlisting}
+[global]
+default_template = proveCluster
+\end{lstlisting}
+
 \clearpage
 
 {\setlength{\parskip}{0mm} \listoftables } % Para que no ponga espacios entre las lineas de indice
 {\setlength{\parskip}{0mm} \listoffigures} % Para que no ponga espacios entre las lineas de indice
+
+% Bibliografía.
+%-----------------------------------------------------------------
+\clearpage
+
+\renewcommand{\bibname}{Referencias}
+\begin{thebibliography}{99}
+\bibitem{SpotInstancesEC2}
+Instancias puntuales de Amazon EC2
+
+\url{http://aws.amazon.com/es/ec2/purchasing-options/spot-instances/}
+\bibitem{OpenGridScheduler}
+Open Grid Scheduler. Documentación del Grid Engine
+
+\url{http://gridscheduler.sourceforge.net/documentation.html}
+\bibitem{CloudInit}
+Documentación de cloudinit
+
+\url{https://cloudinit.readthedocs.org/en/latest/}
+\bibitem{SystemPlugin}
+Sistema de Plugin para StarCluster
+
+\url{http://star.mit.edu/cluster/docs/latest/manual/plugins.html}
+\end{thebibliography}
 
 \end{document}
