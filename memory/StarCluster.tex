@@ -94,7 +94,7 @@ R(x, y) = A \left( \frac{x}{i_x}, \frac{y}{i_y} \right)
 donde \emph{A(x, y)} es la imagen de entrada mientras que \emph{R(x, y)} es la salida y donde el valor de $i_x$ indica el incremento en el eje horizontal 
 e $i_y$ el incremento en el eje vertical. El problema que puede ocasionar dicha transformación es que puede dar valores de números decimales en 
 los índices con lo que intenta referenciar un valor de un pixel que no existe en una imagen. Para poder solucionar este problema se emplea la interpolación. 
-Los métodos más comunes de interpolar una imagen son los siguientes:
+Los métodos más comunes de interpolar una imagen son los siguientes\cite{WOODS}:
 \begin{enumerate} {\setlength{\parskip}{0mm}
 	\item Interpolación por el vecino más próximo.
 	\item Interpolación bilineal.
@@ -230,7 +230,7 @@ int ** getScale(char *mirror, char *result, int height, int width, int delay, fl
 
 \subsection{Técnicas de paralelización utilizadas}
 \subsubsection{Paso de mensajes con MPI}
-Esta técnica se aplicó al bucle más externo. Con ella se pretendía dividir la carga computacional que crea este segmento de código entre varios procesadores, de manera que cada uno de ellos realizase una parte del cálculo, siendo así más rápida la terminación del programa. El motivo de realizar este reparto es dividir las filas de la imagen original para que cada proceso MPI se encargue de escalar su trozo de imagen tal y como se muestra en la figura \ref{fig:repartoFilas}.
+Esta técnica se aplicó al bucle más externo. Con ella se pretendía dividir la carga computacional que crea este segmento de código entre varios procesadores, de manera que cada uno de ellos realizase una parte del cálculo, siendo así más rápida la terminación del programa. El motivo de realizar este reparto es dividir las filas de la imagen original para que cada proceso MPI se encargue de escalar su trozo de imagen tal y como se muestra en la figura \ref{fig:repartoFilas}\cite{MPICH2}\cite{OpenMPI}.
 
 \begin{figure}[h]
         \centering
@@ -384,7 +384,7 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 	Para conseguir este objetivo se usará StarCluster el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube adecuado para programas distribuidos y paralelos.
 	
 \subsection{Instalando StarCluster}
-	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo y instalar StarCluster basta con introducir en la terminal los siguientes comandos:
+	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo y instalar StarCluster basta con introducir en la terminal los siguientes comandos\cite{InstallingStarCluster}:
 \begin{lstlisting}[style=minibash]
 $ curl -O https://pypi.python.org/packages/source/S/StarCluster/StarCluster-0.95.6.tar.gz
 $ tar xvzf StarCluster-0.95.6.tar.gz
@@ -395,7 +395,7 @@ $ sudo python setup.py install
 \end{lstlisting}
 
 \subsection{Creando el archivo de configuración para StarCluster}
-	El primer paso para la creación de un cluster es definir un archivo de configuración en el que se podrán indicar todos los parámetros necesarios. Por defecto el archivo de configuración tiene que estar en \emph{\$HOME/.starcluster/config} pero se le puede cambiar la localización con la variable de entorno \emph{STARCLUSTER\_CONFIG}.
+	El primer paso para la creación de un cluster es definir un archivo de configuración en el que se podrán indicar todos los parámetros necesarios. Por defecto el archivo de configuración tiene que estar en \emph{\$HOME/.starcluster/config} pero se le puede cambiar la localización con la variable de entorno \emph{STARCLUSTER\_CONFIG}\cite{StarClusterUserManual}.
 \begin{lstlisting}[style=minibash]
 $ echo "export STARCLUSTER_CONFIG=\"$PWD/starclusterconfig\"" >> $HOME/.bash_profile 
 $ source $HOME/.bash_profile
@@ -568,8 +568,10 @@ default_template = proveCluster
 \end{enumerate} 
 	Además StarCluster te indica que si usas una VPC que no sea por la de defecto
 
+\subsection{Archivo de configuración a usar}
+
 \subsection{Usando el cluster}
-	Una vez tenemos creado el archivo de configuración toca crear el cluster con el comando \emph{starcluster start namecluster}, donde \emph{namecluster} es una etiqueta que le damos al cluster que vamos a crear. A continuación vemos la salida que nos devolvió el comando
+	Una vez tenemos creado el archivo de configuración toca crear el cluster con el comando \emph{starcluster start namecluster}, donde \emph{namecluster} es una etiqueta que le damos al cluster que vamos a crear. A continuación vemos la salida que nos devolvió el comando y en las imágenes \ref{fig:ClusterDePruebasSG} y \ref{fig:ClusterDePruebasNODES} podemos ver el grupo de seguridad y las instancias en el panel de Amazon EC2 que se crearon para el cluster.
 \begin{lstlisting}[style=miniBash]
 $ starcluster start ClusterDePruebas
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -659,6 +661,19 @@ option to the 'start' command:
 This will start all 'stopped' nodes and reconfigure the
 cluster.
 \end{lstlisting}
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.75\textwidth]{img/ClusterDePruebasSG.png}
+  \caption{El grupo de seguridad que creo StarCluster para el cluster}
+  \label{fig:ClusterDePruebasSG}
+\end{figure}
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.75\textwidth]{img/ClusterDePruebasNODES.png}
+  \caption{Las instancias que aparecen en el panel de Amazon EC2 son los nodos del cluster}
+  \label{fig:ClusterDePruebasNODES}
+\end{figure}
 
 	Una vez tenemos creado el cluster podemos consultar los cluster que hemos creado con el siguiente comando:
 \begin{lstlisting}[style=miniBash]
@@ -750,7 +765,8 @@ Current System Stats:
   Swap usage:   0%
 
     https://landscape.canonical.com/
-sgeadmin@master:~$ qhost HOSTNAME                ARCH         NCPU  LOAD  MEMTOT  MEMUSE  SWAPTO  SWAPUS
+sgeadmin@master:~$ qhost
+HOSTNAME                ARCH         NCPU  LOAD  MEMTOT  MEMUSE  SWAPTO  SWAPUS
 -------------------------------------------------------------------------------
 global                  -               -     -       -       -       -       -
 master                  linux-x64       1  0.12  993.6M  103.1M     0.0     0.0
@@ -837,12 +853,118 @@ Terminate EBS cluster ClusterDePruebas (y/n)? y
 >>> Removing security group: @sc-ClusterDePruebas 
 \end{lstlisting}
 
-\section{Ejecución del programa paralelo en un cluster}
-	Para probar la ejecución del programa paralelo se usado una configuración con 10 nodos cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosCluster} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
+\subsubsection{Iniciando un cluster a partir de una plantilla que no sea la de por defecto}
+	En el archivo de configuración pueden existir varias plantillas para la creación de un cluster, pero a la hora de ejecutar el comando \emph{starcluster start clustername} se utiliza la plantilla que se estableció por defecto dentro de la sección [global]. Si necesitamos crear otra plantilla tendremos que especificarlo  con el parámetro \emph{--cluster-template=CLUSTER\_TEMPLATE} donde \emph{CLUSTER\_TEMPLATE} es la plantilla que queremos cargar. El siguiente comando inicia la plantilla \emph{mediumcluster}:
+\begin{lstlisting}[style=miniBash]
+$ starcluster start --cluster-template=mediumcluster mpicluster
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
 
+>>> Validating cluster template settings...
+>>> Cluster template settings are valid
+>>> Starting cluster...
+>>> Launching a 10-node cluster...
+>>> Creating security group @sc-mpicluster...
+Reservation:r-79c02e92
+>>> Waiting for instances to propagate...
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Waiting for cluster to come up... (updating every 30s)
+>>> Waiting for all nodes to be in a 'running' state...
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Waiting for SSH to come up on all nodes...
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Waiting for cluster to come up took 1.814 mins
+>>> The master node is ec2-54-174-239-221.compute-1.amazonaws.com
+>>> Configuring cluster...
+>>> Running plugin starcluster.clustersetup.DefaultClusterSetup
+>>> Configuring hostnames...
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Creating cluster user: sgeadmin (uid: 1001, gid: 1001)
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Configuring scratch space for user(s): sgeadmin
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Configuring /etc/hosts on each node
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Starting NFS server on master
+>>> Configuring NFS exports path(s):
+/home
+>>> Mounting all NFS export path(s) on 9 worker node(s)
+9/9 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Setting up NFS took 0.257 mins
+>>> Configuring passwordless ssh for root
+>>> Configuring passwordless ssh for sgeadmin
+>>> Running plugin starcluster.plugins.sge.SGEPlugin
+>>> Configuring SGE...
+>>> Configuring NFS exports path(s):
+/opt/sge6
+>>> Mounting all NFS export path(s) on 9 worker node(s)
+9/9 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Setting up NFS took 0.203 mins
+>>> Installing Sun Grid Engine...
+9/9 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Creating SGE parallel environment 'orte'
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Adding parallel environment 'orte' to queue 'all.q'
+>>> Running plugin mpich2
+>>> Creating MPICH2 hosts file
+>>> Configuring MPICH2 profile
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Setting MPICH2 as default MPI on all nodes
+10/10 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> MPICH2 is now ready to use
+>>> Use mpicc, mpif90, mpirun, etc. to compile and run your MPI apps
+>>> Configuring cluster took 2.117 mins
+>>> Starting cluster took 4.020 mins
+
+The cluster is now ready to use. To login to the master node
+as root, run:
+
+    $ starcluster sshmaster mpicluster
+
+If you're having issues with the cluster you can reboot the
+instances and completely reconfigure the cluster from
+scratch using:
+
+    $ starcluster restart mpicluster
+
+When you're finished using the cluster and wish to terminate
+it and stop paying for service:
+
+    $ starcluster terminate mpicluster
+
+Alternatively, if the cluster uses EBS instances, you can
+use the 'stop' command to shutdown all nodes and put them
+into a 'stopped' state preserving the EBS volumes backing
+the nodes:
+
+    $ starcluster stop mpicluster
+
+WARNING: Any data stored in ephemeral storage (usually /mnt)
+will be lost!
+
+You can activate a 'stopped' cluster by passing the -x
+option to the 'start' command:
+
+    $ starcluster start -x mpicluster
+
+This will start all 'stopped' nodes and reconfigure the
+cluster.
+\end{lstlisting}
+	
+	
+
+\section{Ejecución del programa paralelo en un cluster}
+
+\subsection{Tipo de instancias de propósito general}
+	Para probar la ejecución del programa paralelo se usado una configuración con 10 nodos cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterM} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
+
+	Si nos fijamos en los resultados obtenidos en la tabla \ref{tab:resultadosClusterM} puede llamar la atención como varían los valores y que no siguen una distribución como la que aparece en los resultados al ejecutarlos en local. Podemos ver que el speedup que se consigue al usar cinco procesos es superior al lo que sería lo óptimo. Esto se debe a que las instancias que se ejecutan son máquinas virtuales de las que tenemos el control pero no de la máquina física sobre la que se ejecuten pudiendo haber otras instancias de otros usuarios ejecutándose en la misma máquina física de tal manera que no tenemos la CPU física para nuestros procesos como pasaba en el caso de ejecutarse en local. Esto es lo que puede explicar los datos atípicos que parecen mejorar o empeorar los resultados. Además para los casos en los que los resultados parecen que empeoran mucho esto se debe a la comunicación entre procesos de tal manera que si los datos tienen que viajar entre máquinas es muy probable que exista otro tráfico que haga que los mensajes de comunicación del programa no se entreguen todo lo rápido que podría ser.
+	
+%http://aws.amazon.com/es/ec2/instance-types/#instance-type-matrix
 \begin{table}[h]
 	\begin{center}
-		\caption{Resultados de ejecutar el programa paralelo en un cluster en Amazon EC2 con 1, 2, 3, 4, 5, 10, 20, 30 y 40 procesos.}
+		\caption{Resultados de ejecutar el programa paralelo en un cluster en Amazon EC2 usando tipos instancias de propósito general con 1, 2, 3, 4, 5, 10, 20, 30 y 40 procesos.}
 		\begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{Procesos} &
@@ -860,9 +982,16 @@ Terminate EBS cluster ClusterDePruebas (y/n)? y
 30 & 11,115 sg & 21,1306 & 70,43\% \\ \hline
 40 &  8,411 sg &  27,9237& 93,07\% \\ \hline
 		\end{tabular}
-		\label{tab:resultadosCluster}
+		\label{tab:resultadosClusterM}
 	\end{center}
 \end{table}
+
+\subsection{Tipo de instancias optimizadas para cálculos}
+
+\section{Conclusiones}
+
+\subsection{Problemas al instalar StarCluster}
+\subsection{Resultados}
 
 \clearpage
 
@@ -875,6 +1004,28 @@ Terminate EBS cluster ClusterDePruebas (y/n)? y
 
 \renewcommand{\bibname}{Referencias}
 \begin{thebibliography}{99}
+\bibitem{WOODS}
+Rafael C. González and Richard E. Woods
+\emph{Digital Image Processing}
+Addison-Wesley, USA
+2nd Edition
+1993
+\bibitem{MPICH2}
+Biblioteca MPI de software libre
+
+\url{http://www.mcs.anl.gov/research/projects/mpich2/}
+\bibitem{OpenMPI}
+Biblioteca MPI de software libre
+
+\url{http://www.open-mpi.org}
+\bibitem{InstallingStarCluster}
+Instalación de StarCluster
+
+\url{http://star.mit.edu/cluster/docs/latest/installation.html}
+\bibitem{StarClusterUserManual}
+Manual de uso de StarCluster
+
+\url{http://star.mit.edu/cluster/docs/latest/manual/index.html}
 \bibitem{SpotInstancesEC2}
 Instancias puntuales de Amazon EC2
 
