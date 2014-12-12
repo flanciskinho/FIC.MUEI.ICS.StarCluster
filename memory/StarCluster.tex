@@ -561,6 +561,309 @@ node_instance_type = c1.xlarge
 default_template = proveCluster
 \end{lstlisting}
 
+	Las nuevas cuentas de AWS una utilizan VPC por defecto y  StarCluster soporta esta configuración. Sin embargo si ya se quiere usar una VPC ya personalizada por el usuario se puede especificar en el parámetro \emph{subnet\_id}. Por defecto StarCluster no asigna IP públicas todas las instancias y esa es la razón por la que crea todas las instancias en una misma VPC para poder conectarse a todos los nodos. StarCluster no asigna direcciones IP públicas por dos sencillas razones:
+\begin{enumerate}
+	\item Eso ``abriría'' la VPC a internet, lo que es un riesgo para la seguridad
+	\item Se requiere una configuración especial del VPC.
+\end{enumerate} 
+	Además StarCluster te indica que si usas una VPC que no sea por la de defecto
+
+\subsection{Usando el cluster}
+	Una vez tenemos creado el archivo de configuración toca crear el cluster con el comando \emph{starcluster start namecluster}, donde \emph{namecluster} es una etiqueta que le damos al cluster que vamos a crear. A continuación vemos la salida que nos devolvió el comando
+\begin{lstlisting}[style=miniBash]
+$ starcluster start ClusterDePruebas
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+>>> Using default cluster template: provecluster
+>>> Validating cluster template settings...
+>>> Cluster template settings are valid
+>>> Starting cluster...
+>>> Launching a 4-node cluster...
+>>> Creating security group @sc-ClusterDePruebas...
+Reservation:r-1ce20cf7
+>>> Waiting for instances to propagate...
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Waiting for cluster to come up... (updating every 30s)
+>>> Waiting for all nodes to be in a 'running' state...
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Waiting for SSH to come up on all nodes...
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Waiting for cluster to come up took 1.682 mins
+>>> The master node is ec2-54-175-7-72.compute-1.amazonaws.com
+>>> Configuring cluster...
+>>> Running plugin starcluster.clustersetup.DefaultClusterSetup
+>>> Configuring hostnames...
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Creating cluster user: sgeadmin (uid: 1001, gid: 1001)
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Configuring scratch space for user(s): sgeadmin
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Configuring /etc/hosts on each node
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Starting NFS server on master
+>>> Configuring NFS exports path(s):
+/home
+>>> Mounting all NFS export path(s) on 3 worker node(s)
+3/3 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Setting up NFS took 0.229 mins
+>>> Configuring passwordless ssh for root
+>>> Configuring passwordless ssh for sgeadmin
+>>> Running plugin starcluster.plugins.sge.SGEPlugin
+>>> Configuring SGE...
+>>> Configuring NFS exports path(s):
+/opt/sge6
+>>> Mounting all NFS export path(s) on 3 worker node(s)
+3/3 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Setting up NFS took 0.168 mins
+>>> Installing Sun Grid Engine...
+3/3 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Creating SGE parallel environment 'orte'
+4/4 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| 100%  
+>>> Adding parallel environment 'orte' to queue 'all.q'
+>>> Configuring cluster took 2.084 mins
+>>> Starting cluster took 3.858 mins
+
+The cluster is now ready to use. To login to the master node
+as root, run:
+
+    $ starcluster sshmaster ClusterDePruebas
+
+If you're having issues with the cluster you can reboot the
+instances and completely reconfigure the cluster from
+scratch using:
+
+    $ starcluster restart ClusterDePruebas
+
+When you're finished using the cluster and wish to terminate
+it and stop paying for service:
+
+    $ starcluster terminate ClusterDePruebas
+
+Alternatively, if the cluster uses EBS instances, you can
+use the 'stop' command to shutdown all nodes and put them
+into a 'stopped' state preserving the EBS volumes backing
+the nodes:
+
+    $ starcluster stop ClusterDePruebas
+
+WARNING: Any data stored in ephemeral storage (usually /mnt)
+will be lost!
+
+You can activate a 'stopped' cluster by passing the -x
+option to the 'start' command:
+
+    $ starcluster start -x ClusterDePruebas
+
+This will start all 'stopped' nodes and reconfigure the
+cluster.
+\end{lstlisting}
+
+	Una vez tenemos creado el cluster podemos consultar los cluster que hemos creado con el siguiente comando:
+\begin{lstlisting}[style=miniBash]
+$ starcluster listclusters
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+-------------------------------------------------------
+ClusterDePruebas (security group: @sc-ClusterDePruebas)
+-------------------------------------------------------
+Launch time: 2014-12-12 05:25:49
+Uptime: 0 days, 00:06:26
+VPC: vpc-7f9a281a
+Subnet: subnet-e7b46790
+Zone: us-east-1c
+Keypair: mykey
+EBS volumes: N/A
+Cluster nodes:
+     master running i-68627582 ec2-54-175-7-72.compute-1.amazonaws.com
+    node001 running i-69627583 ec2-54-175-7-92.compute-1.amazonaws.com
+    node002 running i-6e627584 ec2-54-175-7-112.compute-1.amazonaws.com
+    node003 running i-6f627585 ec2-54-175-7-109.compute-1.amazonaws.com
+Total nodes: 4
+\end{lstlisting}
+
+	Aunque podemos mirar a través del portal web que se ha creado en cada momento StarCluster nos ofrece herramientas para conectarnos al cluster. Por ejemplo para conectarnos como root bastaría con usar el comando \emph{starcluster sshmaster ClusterDePruebas} done el primer argumento indica que nos queremos conectar al nodo máster y el segundo es a que cluster nos queremos conectar. Para conectarnos con el usuario que especificamos en el archivo de configuración (\emph{sgeadmin}) tendremos que usar el siguiente comando
+\begin{lstlisting}[style=miniBash]
+$ starcluster sshmaster -u sgeadmin ClusterDePruebas
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+The authenticity of host 'ec2-54-175-7-72.compute-1.amazonaws.com (54.175.7.72)' can't be established.
+ECDSA key fingerprint is f3:73:ff:c0:c5:f1:c1:5c:bf:f1:ea:c7:a3:7f:cf:a0.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added 'ec2-54-175-7-72.compute-1.amazonaws.com,54.175.7.72' (ECDSA) to the list of known hosts.
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+          _                 _           _
+__/\_____| |_ __ _ _ __ ___| |_   _ ___| |_ ___ _ __
+\    / __| __/ _` | '__/ __| | | | / __| __/ _ \ '__|
+/_  _\__ \ || (_| | | | (__| | |_| \__ \ ||  __/ |
+  \/ |___/\__\__,_|_|  \___|_|\__,_|___/\__\___|_|
+
+StarCluster Ubuntu 13.04 AMI
+Software Tools for Academics and Researchers (STAR)
+Homepage: http://star.mit.edu/cluster
+Documentation: http://star.mit.edu/cluster/docs/latest
+Code: https://github.com/jtriley/StarCluster
+Mailing list: http://star.mit.edu/cluster/mailinglist.html
+
+This AMI Contains:
+
+  * NVIDIA Driver 331.38
+  * NVIDIA CUDA Toolkit 5.5.22
+  * PyCuda 2013.1.1 and PyOpenCL 2013.2
+  * MAGMA 1.4.1
+  * Intel Ethernet Driver 2.11.3 (ixgbevf)
+  * Open Grid Scheduler (OGS - formerly SGE) queuing system
+  * Condor workload management system
+  * OpenMPI compiled with Open Grid Scheduler support
+  * OpenBLAS - Highly optimized Basic Linear Algebra Routines
+  * NumPy/SciPy linked against OpenBlas
+  * Pandas - Data Analysis Library
+  * IPython 1.1.0 with parallel and notebook support
+  * Julia 0.3pre
+  * and more! (use 'dpkg -l' to show all installed packages)
+
+Open Grid Scheduler/Condor cheat sheet:
+
+  * qstat/condor_q - show status of batch jobs
+  * qhost/condor_status- show status of hosts, queues, and jobs
+  * qsub/condor_submit - submit batch jobs (e.g. qsub -cwd ./job.sh)
+  * qdel/condor_rm - delete batch jobs (e.g. qdel 7)
+  * qconf - configure Open Grid Scheduler system
+
+Current System Stats:
+
+  System load:  0.0               Processes:           94
+  Usage of /:   63.3% of 7.74GB   Users logged in:     0
+  Memory usage: 11%               IP address for eth0: 172.31.28.11
+  Swap usage:   0%
+
+    https://landscape.canonical.com/
+sgeadmin@master:~$ qhost HOSTNAME                ARCH         NCPU  LOAD  MEMTOT  MEMUSE  SWAPTO  SWAPUS
+-------------------------------------------------------------------------------
+global                  -               -     -       -       -       -       -
+master                  linux-x64       1  0.12  993.6M  103.1M     0.0     0.0
+node001                 linux-x64       1  0.09  993.6M   89.8M     0.0     0.0
+node002                 linux-x64       1  0.10  993.6M   89.5M     0.0     0.0
+node003                 linux-x64       1  0.13  993.6M   89.3M     0.0     0.0
+sgeadmin@master:~$ cat /etc/hosts
+127.0.0.1 localhost
+
+# The following lines are desirable for IPv6 capable hosts
+::1 ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+ff02::3 ip6-allhosts
+172.31.28.11 master
+172.31.28.14 node001
+172.31.28.12 node002
+172.31.28.13 node003
+sgeadmin@master:~$ logout
+Connection to ec2-54-175-7-72.compute-1.amazonaws.com closed.
+\end{lstlisting}
+
+	Para pasar información al cluster podemos usar el comando \emph{starcluster put clustertag pathlocal pathremote} donde \emph{clustertag} es la etiqueta que le pusimos al cluster, \emph{pathlocal} es la ruta del archivo/directorio\footnote{Tanto el comando \emph{starcluster put} como \emph{starcluster get} soportan recursividad} en el equipo local y \emph{pathremote} es la ruta donde situar el archivo/directorio en el servidor. Por defecto este comando opera en el nodo master como root, pero se puede usar las opciones \emph{--user username} donde \emph{username} es el nombre de usuario que realizará la operación y con \emph{--node nodename} especificamos mediante el parámetro \emph{nodename} el nombre del nodo contra el cual se realiza la operación. Para recuperar información del servidor es con el comando \emph{starcluster get clustertag pathremote pathlocal} y tiene un funcionamiento análogo a \emph{starcluster put} admitiendo las mismas opciones.
+\begin{lstlisting}[style=miniBash]
+$ starcluster put ClusterDePruebas --user sgeadmin /tmp/paralelizado.c code.c
+StarCluster  - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+paralelizado.c 100% |||||||||||||||||||||||||||||||| Time: 00:00:00   3.25 M/s
+$ starcluster get ClusterDePruebas --user sgeadmin code /tmp/code.c
+StarCluster  - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+/tmp/code.c 100% |||||||||||||||||||||||||||||||| Time: 00:00:00   44.75 K/s
+$ diff /tmp/paralelizado.c /tmp/code.c
+$
+\end{lstlisting}
+
+	StarCluster proporciona una instrucción para ver la lista de clusters que tenemos en ese momento ejecutandose. Para ver cuales son basta con introducir el siguiente comando:
+\begin{lstlisting}[style=miniBash]	
+$ starcluster listclusters
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+-------------------------------------------------------
+ClusterDePruebas (security group: @sc-ClusterDePruebas)
+-------------------------------------------------------
+Launch time: 2014-12-12 05:25:49
+Uptime: 0 days, 00:06:26
+VPC: vpc-7f9a281a
+Subnet: subnet-e7b46790
+Zone: us-east-1c
+Keypair: mykey
+EBS volumes: N/A
+Cluster nodes:
+     master running i-68627582 ec2-54-175-7-72.compute-1.amazonaws.com
+    node001 running i-69627583 ec2-54-175-7-92.compute-1.amazonaws.com
+    node002 running i-6e627584 ec2-54-175-7-112.compute-1.amazonaws.com
+    node003 running i-6f627585 ec2-54-175-7-109.compute-1.amazonaws.com
+Total nodes: 4
+
+\end{lstlisting}
+	
+	Para finalizar el cluster basta con introducir la siguiente instrucción:
+\begin{lstlisting}[style=miniBash]
+$ starcluster terminate ClusterDePruebas
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+Terminate EBS cluster ClusterDePruebas (y/n)? y
+>>> Running plugin starcluster.plugins.sge.SGEPlugin
+>>> Running plugin starcluster.clustersetup.DefaultClusterSetup
+>>> Terminating node: master (i-68627582)
+>>> Terminating node: node001 (i-69627583)
+>>> Terminating node: node002 (i-6e627584)
+>>> Terminating node: node003 (i-6f627585)
+>>> Waiting for cluster to terminate... 
+>>> Removing security group: @sc-ClusterDePruebas 
+\end{lstlisting}
+
+\section{Ejecución del programa paralelo en un cluster}
+	Para probar la ejecución del programa paralelo se usado una configuración con 10 nodos cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosCluster} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
+
+\begin{table}[h]
+	\begin{center}
+		\caption{Resultados de ejecutar el programa paralelo en un cluster en Amazon EC2 con 1, 2, 3, 4, 5, 10, 20, 30 y 40 procesos.}
+		\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Procesos} &
+\textbf{Tiempo} &
+\textbf{Speedup} &
+\textbf{Eficiencia} \\ \hline
+\hline
+ 1 &234,867 sg &  1          & 100\% \\ \hline
+ 2 &132,390 sg &  1,7740 & 88,36\% \\ \hline 
+ 3 & 97,506 sg &  2,4087 & 80,29\% \\ \hline
+ 4 & 78,707 sg &  2,9840 & 74,60\% \\ \hline
+ 5 & 42,560 sg &  5,5184 & 110,3\% \\ \hline
+10 & 21,230 sg & 11,0629 & 110,6\% \\ \hline
+20 & 16,990 sg &  13,8238& 69,11\% \\ \hline
+30 & 11,115 sg & 21,1306 & 70,43\% \\ \hline
+40 &  8,411 sg &  27,9237& 93,07\% \\ \hline
+		\end{tabular}
+		\label{tab:resultadosCluster}
+	\end{center}
+\end{table}
+
 \clearpage
 
 {\setlength{\parskip}{0mm} \listoftables } % Para que no ponga espacios entre las lineas de indice
