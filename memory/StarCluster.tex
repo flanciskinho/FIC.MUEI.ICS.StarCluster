@@ -230,7 +230,7 @@ int ** getScale(char *mirror, char *result, int height, int width, int delay, fl
 
 \subsection{Técnicas de paralelización utilizadas}
 \subsubsection{Paso de mensajes con MPI}
-Esta técnica se aplicó al bucle más externo. Con ella se pretendía dividir la carga computacional que crea este segmento de código entre varios procesadores, de manera que cada uno de ellos realizase una parte del cálculo, siendo así más rápida la terminación del programa. El motivo de realizar este reparto es dividir las filas de la imagen original para que cada proceso MPI se encargue de escalar su trozo de imagen tal y como se muestra en la figura \ref{fig:repartoFilas}\cite{MPICH2}\cite{OpenMPI}.
+Esta técnica se aplicó al bucle más externo. Con ella se pretendía dividir la carga computacional que crea este segmento de código entre varios procesadores, de manera que cada uno de ellos realizase una parte del cálculo, siendo así más rápida la terminación del programa. El motivo de realizar este reparto es dividir las filas de la imagen original para que cada proceso MPI se encargue de escalar su trozo de imagen tal y como se muestra en la figura \ref{fig:repartoFilas}\cite{MPICH2, OpenMPI}.
 
 \begin{figure}[h]
         \centering
@@ -383,7 +383,7 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 
 	Para conseguir este objetivo se usará StarCluster el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube adecuado para programas distribuidos y paralelos.
 	
-\subsection{Instalando StarCluster}
+\subsection{Instalando StarCluster}\label{sec:InstallStarCluster}
 	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo y instalar StarCluster basta con introducir en la terminal los siguientes comandos\cite{InstallingStarCluster}:
 \begin{lstlisting}[style=minibash]
 $ curl -O https://pypi.python.org/packages/source/S/StarCluster/StarCluster-0.95.6.tar.gz
@@ -987,10 +987,64 @@ cluster.
 \end{table}
 
 \subsection{Tipo de instancias optimizadas para cálculos}
+	Para probar la ejecución del programa paralelo se usado una configuración con 5 nodos cuyo tipo de instancia es el \emph{c3.2xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterC} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
 
+	Podemos ver que la eficiencia se mantiene casi constante durante las primeras ejecuciones mientras que  a partir de los 30 procesos empieza a bajar considerablemente. Esto se debe a que las llamadas que se usan de MPI son llamadas colectivas donde todos los procesos se tienen que esperar a que todos los demás lleguen al mismo punto (como si fuese una llamada \emph{MPI\_Barrier}) para empezar a realizar la comunicación, y con 30 procesos ya es una cantidad considerable de procesos para sincronización (hay que darse cuenta de que la sincronización no tiene porque ser dentro de la misma máquina si no que puede ser con otras máquinas con lo que hay que hacer la sincronización a traves de la red).
+
+\begin{table}[h]
+	\begin{center}
+		\caption{Resultados de ejecutar el programa paralelo en un cluster en Amazon EC2 usando tipos instancias de optimizadas para computo.}
+		\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Procesos} &
+\textbf{Tiempo} &
+\textbf{Speedup} &
+\textbf{Eficiencia} \\ \hline
+\hline
+ 1 &153,85 sg &  1          & 100\% \\ \hline
+ 2 & 76,93 sg &  1,9999 & 99,99\% \\ \hline 
+ 3 & 51,233 sg &  3,0029 & 100,10\% \\ \hline 
+ 4 & 38,575 sg &  3,9883 & 99,71\% \\ \hline
+ 5 & 30,865 sg &  4,9846 & 99,69\% \\ \hline
+10 & 15,392 sg &  9,9955 & 99,95\% \\ \hline
+20 & 7,772 sg & 19,7954 & 98,98\% \\ \hline
+30 & 7,461 sg &  20,6206& 68,74\% \\ \hline
+40 & 5,818 sg & 26,4438 & 66,11\% \\ \hline
+50 & 6,240 sg & 24,6554 & 49,31\% \\ \hline
+60 & 6,762 sg & 22,7521 & 37,92\% \\ \hline
+		\end{tabular}
+		\label{tab:resultadosClusterM}
+	\end{center}
+\end{table}
+
+\clearpage
 \section{Conclusiones}
 
 \subsection{Problemas al instalar StarCluster}
+
+\subsubsection{Instalación en MAC OS X}
+	StarCluster está disponible mediante \emph{PyPI} (Python Package Index) cuya herramienta se encuentra disponible tanto para Mac OS X como para sistemas Linux. Debido a esto probamos a instalarlo en Mac OS X 10.9.4 como muestra en la sección \ref{sec:InstallStarCluster}, con lo que después de algún mensaje de warning la instalación se completo sin dar ningún mensaje de warning. Si configuramos el archivo de configuración para lanzar un cluster y intentabamos crearlo nos daba el siguiente mensaje:
+\begin{lstlisting}[style=miniBash]
+$ starcluster start pruebas
+StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
+Software Tools for Academics and Researchers (STAR)
+Please submit bug reports to starcluster@mit.edu
+
+>>> Using default cluster template: provecluster
+>>> Validating cluster template settings...
+!!! ERROR - Cluster settings are not valid:
+!!! ERROR - key_location '/Users/flanciskinho/.ssh/AWS/mykey.rsa' does
+!!! ERROR - not exist
+\end{lstlisting}
+Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo de configuración no existe en Amazon EC2. Se probo crear la clave de tres formas distintas pero consiguiendo el mismo mensaje
+\begin{enumerate}
+	\item Creando la clave mediante el panel web de Amazon EC2
+	\item Creando la clave usando el comando \emph{ssh-keygen -t rsa}
+	\item Haciendo uso de starcluster con el comando \emph{starcluster createkey mykey -o ~/.ssh/mykey.rsa} que añade la clave pública en Amazon EC2 bajo el nombre \emph{mykey} y añade la clave privada \emph{mykey.rsa} en nuestro equipo
+\end{enumerate}
+
+	La solución paso por instalar StarCluster en un sistema basado en linux (más concretamente en Ubuntu 14.04).
+
 \subsection{Resultados}
 
 \clearpage
@@ -1026,6 +1080,10 @@ Instalación de StarCluster
 Manual de uso de StarCluster
 
 \url{http://star.mit.edu/cluster/docs/latest/manual/index.html}
+\bibitem{SystemPlugin}
+Sistema de Plugin para StarCluster
+
+\url{http://star.mit.edu/cluster/docs/latest/manual/plugins.html}
 \bibitem{SpotInstancesEC2}
 Instancias puntuales de Amazon EC2
 
@@ -1038,10 +1096,6 @@ Open Grid Scheduler. Documentación del Grid Engine
 Documentación de cloudinit
 
 \url{https://cloudinit.readthedocs.org/en/latest/}
-\bibitem{SystemPlugin}
-Sistema de Plugin para StarCluster
-
-\url{http://star.mit.edu/cluster/docs/latest/manual/plugins.html}
 \end{thebibliography}
 
 \end{document}
