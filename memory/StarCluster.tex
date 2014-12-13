@@ -83,9 +83,13 @@
 %\vspace{1cm} % Para dejar un espacio con respecto a la tabla
 
 \section{Descripción de la práctica}
-	El objetivo de esta práctica es poder crear un entorno para poder ejecutar programas paralelos con diversas máquinas. Para ello empezaremos por crearnos un programa paralelo para poder ver las ventajas de poder ejecutar programas en varias máquinas.
+	El objetivo de esta práctica es poder crear un entorno para poder ejecutar programas paralelos con diversas máquinas. Para ello empezaremos por crearnos un programa paralelo (sección\ref{sec:ParallelProgram} )para poder ver las ventajas de poder ejecutar la aplicación creada en diferentes entornos como puede ser en local (sección \ref{sec:ejStarCluster}) o en un cluster (sección \ref{sec:ejStarCluster}).
 	
-\section{Programa paralelo}
+	Para la creación de un cluster se hará sobre Amazon EC2 usando la herramienta StarCluster (sección \ref{sec:InstallStarCluster}).
+	
+	Para acabar se explicará en un apartado de conclusiones (sección \ref{sec:Conclusion}) los problemas de que se tuvieron al instalar StarCluster y un comparativa de los resultados obtenidos.
+	
+\section{Programa paralelo}\label{sec:ParallelProgram}
 {\setlength{\parskip}{0mm}
 	La aplicación que se desarrollo en estre trabajo es una manera de escalar una imagen digital. Dicho proceso se hace mediante la siguiente transformación:
 \begin{equation}
@@ -376,7 +380,7 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 %%%%%%%%%%%%%%%%%%%%
 
 \clearpage
-\section{Creación de un cluster en Amazon EC2 con StarCluster}
+\section{Creación de un cluster en Amazon EC2 con StarCluster}\label{sec:InstallStarCluster}
 	En el apartados anteriores vimos que hay programas que se puede paralelizar y que se pueden obtener mejoras de tiempo con su ejecución paralela, pero que su ejecución debe de ser de manera ordenada para que no todos los trabajos se ejecuten a la vez y sobrecarguen la máquina.
 
 	El objetivo de este trabajo es poder implementar un servicio de colas similar al que se puede acceder a las máquinas del CESGA. Estas colas son  sistemas de acceso ordenado de los distintos trabajos a los recursos de un servidor, de tal manera que su finalidad es permitir que los recursos se compartan de forma equitativa entre todos los usuarios y que el servidor no se sobrecargue intentando ejecutar todos los programas a la vez. Cundo los trabajos que se encuentran en cola exceden los recursos disponibles en el servidor, un número determinado de los mismos pueden entrar en ejecución, mientras que el resto debe esperar a que tenga suficientes recursos disponibles.
@@ -569,14 +573,92 @@ default_template = proveCluster
 \end{lstlisting}
 
 	Las nuevas cuentas de AWS una utilizan VPC por defecto y  StarCluster soporta esta configuración. Sin embargo si ya se quiere usar una VPC ya personalizada por el usuario se puede especificar en el parámetro \emph{subnet\_id}. Por defecto StarCluster no asigna IP públicas todas las instancias y esa es la razón por la que crea todas las instancias en una misma VPC para poder conectarse a todos los nodos. StarCluster no asigna direcciones IP públicas por dos sencillas razones:
+{\setlength{\parskip}{0mm}
 \begin{enumerate}
+{\setlength{\parskip}{0mm}
 	\item Eso ``abriría'' la VPC a internet, lo que es un riesgo para la seguridad
 	\item Se requiere una configuración especial del VPC.
+}
 \end{enumerate} 
+}
 	Además StarCluster te indica que si usas una VPC que no sea por la de defecto
 
 \subsection{Archivo de configuración a usar}
+	En la figura \ref{fig:configfile} podemos ver el archivo de configuración usado para StarCluster. Como podemos ver la configuración es muy corta. Basta con especificar el acceso (credenciales para AWS y el ``par de claves'') y las características del cluster.
+	
+	Podemos ver que se crearon tres plantillas diferentes de cluster:
+{\setlength{\parskip}{0mm}
+\begin{enumerate}
+{\setlength{\parskip}{0mm}
+	\item \textbf{provecluster}: Es un cluster en el que se uso para probar el funcionamiento de de la arquitectura creada por StarCluster. Este se uso con instancias de tipo t2.medium por lo baratas que son y para comprobar el funcionamiento son válidas.
+	\item \textbf{mediumcluster}: Es el cluster que se creo con instancias de propósito general. La instancias m3.xlarge usan 4 vCPU con lo que al tener 10 nodos disponemos un total de 40 CPU virtuales.
+	\item \textbf{largecluster}: Es el cluster que se creo con instancias optimizadas para cálculo. La instancias c3.2xlarge usan 8 vCPU con lo que al tener 5 nodos disponemos un total de 40 CPU virtuales.
+}
+\end{enumerate}
+}
 
+\begin{figure}[h]
+\centering
+\begin{lstlisting}
+####################################
+## StarCluster Configuration File ##
+####################################
+[global]
+DEFAULT_TEMPLATE=provecluster
+
+#############################################
+## AWS Credentials and Connection Settings ##
+#############################################
+[aws info]
+AWS_ACCESS_KEY_ID=AKIAIBAREPSSNKLL43KA
+AWS_SECRET_ACCESS_KEY=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
+
+AWS_USER_ID=starcluster
+AWS_REGION_NAME = us-east-1
+AWS_REGION_HOST = ec2.us-east-1.amazonaws.com
+
+###########################
+## Defining EC2 Keypairs ##
+###########################
+[key mykey]
+KEY_LOCATION=~/.ssh/mykey.rsa
+
+################################
+## Defining Cluster Templates ##
+################################
+[cluster provecluster]
+KEYNAME=mykey
+CLUSTER_SIZE = 4
+CLUSTER_USER = sgeadmin
+CLUSTER_SHELL = bash
+NODE_IMAGE_ID = ami-6b211202
+NODE_INSTANCE_TYPE = t2.medium
+
+###########################################
+## Defining Additional Cluster Templates ##
+###########################################
+[cluster mediumcluster]
+EXTENDS=provecluster
+NODE_INSTANCE_TYPE = m3.xlarge
+CLUSTER_SIZE=10
+PLUGINS=mpich2
+
+[cluster largecluster]
+EXTENDS=mediumcluster
+NODE_INSTANCE_TYPE=c3.2xlarge
+CLUSTER_SIZE=5
+
+######################
+## Built-in Plugins ##
+######################
+[plugin mpich2]
+SETUP_CLASS = starcluster.plugins.mpich2.MPICH2Setup
+\end{lstlisting}
+\caption{Archivo de configuración usado para StarCluster.}
+\label{fig:configfile}
+\end{figure}	
+
+\clearpage
 \subsection{Usando el cluster}
 	Una vez tenemos creado el archivo de configuración toca crear el cluster con el comando \emph{starcluster start namecluster}, donde \emph{namecluster} es una etiqueta que le damos al cluster que vamos a crear. A continuación vemos la salida que nos devolvió el comando y en las imágenes \ref{fig:ClusterDePruebasSG} y \ref{fig:ClusterDePruebasNODES} podemos ver el grupo de seguridad y las instancias en el panel de Amazon EC2 que se crearon para el cluster.
 \begin{lstlisting}[style=miniBash]
@@ -961,7 +1043,7 @@ cluster.
 	
 	
 
-\section{Ejecución del programa paralelo en un cluster}
+\section{Ejecución del programa paralelo en un cluster}\label{sec:ejStarCluster}
 
 \subsection{Tipo de instancias de propósito general}\label{sec:ejM3}
 	Para probar la ejecución del programa paralelo se usado una configuración con 10 nodos cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterM} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
@@ -994,7 +1076,7 @@ cluster.
 \end{table}
 
 \subsection{Tipo de instancias optimizadas para cálculos}\label{sec:ejC3}
-	Para probar la ejecución del programa paralelo se usado una configuración con 5 nodos cuyo tipo de instancia es el \emph{c3.2xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterC} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
+	Para probar la ejecución del programa paralelo se usado una configuración con 5 nodos cuyo tipo de instancia es el \emph{c3.2xlarge} que tienen 8 VCPUs cada una. En la tabla \ref{tab:resultadosClusterC} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
 
 	Podemos ver que la eficiencia se mantiene casi constante durante las primeras ejecuciones mientras que  a partir de los 30 procesos empieza a bajar considerablemente. Esto se debe a que las llamadas que se usan de MPI son llamadas colectivas donde todos los procesos se tienen que esperar a que todos los demás lleguen al mismo punto (como si fuese una llamada \emph{MPI\_Barrier}) para empezar a realizar la comunicación, y con 30 procesos ya es una cantidad considerable de procesos para sincronización (hay que darse cuenta de que la sincronización no tiene porque ser dentro de la misma máquina si no que puede ser con otras máquinas con lo que hay que hacer la sincronización a traves de la red).
 
@@ -1018,14 +1100,12 @@ cluster.
 30 & 7,461 sg &  20,6206& 68,74\% \\ \hline
 40 & 5,818 sg & 26,4438 & 66,11\% \\ \hline
 		\end{tabular}
-		\label{tab:resultadosClusterM}
+		\label{tab:resultadosClusterC}
 	\end{center}
 \end{table}
 
 \clearpage
-\section{Conclusiones}
-
-
+\section{Conclusiones}\label{sec:Conclusion}
 
 \subsection{Problemas al instalar StarCluster}
 
@@ -1054,7 +1134,7 @@ Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo d
 
 	La solución paso por instalar StarCluster en un sistema basado en linux (más concretamente en Ubuntu 14.04).
 
-\subsection{Resultados}
+\subsection{Resultados}\label{sec:ConclusionResultados}
 	Las pruebas para la ejecución del problema propuesto en esta práctica se han realizado con tres configuraciones diferentes
 {\setlength{\parskip}{0mm}\begin{enumerate}
 {\setlength{\parskip}{0mm}
