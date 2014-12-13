@@ -319,7 +319,7 @@ void fill_aux_begin(int *fill, int size, int bytes) {
 
 \clearpage
 
-\section{Ejecución del  programa paralelo en local}
+\section{Ejecución del  programa paralelo en local}\label{sec:ejLocal}
 	Para empezar a ver los beneficios de la paralelización se puede ejecutar el programa en cualquier ordenador personal\footnote{Es necesario que tenga un procesador multicore para que se pueda apreciar la diferencia de tiempos}. La máquina en la que se va a probar tiene un procesador Intel Core i7-4820k\footnote{\url{http://ark.intel.com/es-es/products/77781/Intel-Core-i7-4820K-Processor-10M-Cache-up-to-3_90-GHz}} de 4 núcleos en el que está montado un sistema operativo Ubuntu 14.04.
 	
 	Lo primero que tenemos que hacer es instalar un versión de MPI
@@ -381,8 +381,15 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 
 	El objetivo de este trabajo es poder implementar un servicio de colas similar al que se puede acceder a las máquinas del CESGA. Estas colas son  sistemas de acceso ordenado de los distintos trabajos a los recursos de un servidor, de tal manera que su finalidad es permitir que los recursos se compartan de forma equitativa entre todos los usuarios y que el servidor no se sobrecargue intentando ejecutar todos los programas a la vez. Cundo los trabajos que se encuentran en cola exceden los recursos disponibles en el servidor, un número determinado de los mismos pueden entrar en ejecución, mientras que el resto debe esperar a que tenga suficientes recursos disponibles.
 
-	Para conseguir este objetivo se usará StarCluster el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube adecuado para programas distribuidos y paralelos.
-	
+	Para conseguir este objetivo se usará StarCluster el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube adecuado para programas distribuidos y paralelos. La estructura que monta se puede ver en la figura \ref{fig:StarClusterOverview} donde se crea un nodo \emph{Master} y varios nodos \emph{Worker}.
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.65\textwidth]{img/scoverview.png}
+  \caption{Arquitectura que se monta con StarCluster.}
+  \label{fig:StarClusterOverview}
+\end{figure}
+
 \subsection{Instalando StarCluster}\label{sec:InstallStarCluster}
 	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo y instalar StarCluster basta con introducir en la terminal los siguientes comandos\cite{InstallingStarCluster}:
 \begin{lstlisting}[style=minibash]
@@ -956,7 +963,7 @@ cluster.
 
 \section{Ejecución del programa paralelo en un cluster}
 
-\subsection{Tipo de instancias de propósito general}
+\subsection{Tipo de instancias de propósito general}\label{sec:ejM3}
 	Para probar la ejecución del programa paralelo se usado una configuración con 10 nodos cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterM} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
 
 	Si nos fijamos en los resultados obtenidos en la tabla \ref{tab:resultadosClusterM} puede llamar la atención como varían los valores y que no siguen una distribución como la que aparece en los resultados al ejecutarlos en local. Podemos ver que el speedup que se consigue al usar cinco procesos es superior al lo que sería lo óptimo. Esto se debe a que las instancias que se ejecutan son máquinas virtuales de las que tenemos el control pero no de la máquina física sobre la que se ejecuten pudiendo haber otras instancias de otros usuarios ejecutándose en la misma máquina física de tal manera que no tenemos la CPU física para nuestros procesos como pasaba en el caso de ejecutarse en local. Esto es lo que puede explicar los datos atípicos que parecen mejorar o empeorar los resultados. Además para los casos en los que los resultados parecen que empeoran mucho esto se debe a la comunicación entre procesos de tal manera que si los datos tienen que viajar entre máquinas es muy probable que exista otro tráfico que haga que los mensajes de comunicación del programa no se entreguen todo lo rápido que podría ser.
@@ -986,7 +993,7 @@ cluster.
 	\end{center}
 \end{table}
 
-\subsection{Tipo de instancias optimizadas para cálculos}
+\subsection{Tipo de instancias optimizadas para cálculos}\label{sec:ejC3}
 	Para probar la ejecución del programa paralelo se usado una configuración con 5 nodos cuyo tipo de instancia es el \emph{c3.2xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterC} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
 
 	Podemos ver que la eficiencia se mantiene casi constante durante las primeras ejecuciones mientras que  a partir de los 30 procesos empieza a bajar considerablemente. Esto se debe a que las llamadas que se usan de MPI son llamadas colectivas donde todos los procesos se tienen que esperar a que todos los demás lleguen al mismo punto (como si fuese una llamada \emph{MPI\_Barrier}) para empezar a realizar la comunicación, y con 30 procesos ya es una cantidad considerable de procesos para sincronización (hay que darse cuenta de que la sincronización no tiene porque ser dentro de la misma máquina si no que puede ser con otras máquinas con lo que hay que hacer la sincronización a traves de la red).
@@ -1020,6 +1027,8 @@ cluster.
 \clearpage
 \section{Conclusiones}
 
+
+
 \subsection{Problemas al instalar StarCluster}
 
 \subsubsection{Instalación en MAC OS X}
@@ -1037,18 +1046,57 @@ Please submit bug reports to starcluster@mit.edu
 !!! ERROR - not exist
 \end{lstlisting}
 Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo de configuración no existe en Amazon EC2. Se probo crear la clave de tres formas distintas pero consiguiendo el mismo mensaje
-\begin{enumerate}
+{\setlength{\parskip}{0mm}\begin{enumerate}
+{\setlength{\parskip}{0mm}
 	\item Creando la clave mediante el panel web de Amazon EC2
 	\item Creando la clave usando el comando \emph{ssh-keygen -t rsa}
 	\item Haciendo uso de starcluster con el comando \emph{starcluster createkey mykey -o ~/.ssh/mykey.rsa} que añade la clave pública en Amazon EC2 bajo el nombre \emph{mykey} y añade la clave privada \emph{mykey.rsa} en nuestro equipo
-\end{enumerate}
+}
+\end{enumerate}}
 
 	La solución paso por instalar StarCluster en un sistema basado en linux (más concretamente en Ubuntu 14.04).
 
 \subsection{Resultados}
+	Las pruebas para la ejecución del problema propuesto en esta práctica se han realizado con tres configuraciones diferentes
+{\setlength{\parskip}{0mm}\begin{enumerate}
+{\setlength{\parskip}{0mm}
+	\item Una configuración en una máquina local (sección \ref{sec:ejLocal}).
+	\item Una configuración con un cluster en Amazon EC2 con instancias de propósito general (sección \ref{sec:ejM3}).
+	\item Una configuración con un cluster en Amazon EC2 con instancias optimizadas para cálculo (sección \ref{sec:ejC3}).
+}
+\end{enumerate}}
+	Si comparamos los tiempos de las ejecuciones en ambas configuraciones (véase la figura \ref{fig:time}) podemos ver que para una cantidad menos de procesos se ejecuta más rápido en la máquina local que usando las instancias de Amazon EC2 lo cual es lógico por la máquina local tiene una velocidad de reloj de 3,7 GHz mientras que las instancias para propósito general tienen una velocidad de 2,5 GHZ y las optimizadas para cálculo 2,8 GHz\footnote{ Velocidad de reloj para los distintos tipos de instancia de Amazon EC2: \url{http://aws.amazon.com/es/ec2/instance-types/\#instance-type-matrix}}.
+
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.65\textwidth]{img/time.pdf}
+  \caption{Diferencia de tiempos. Rojo: ejecución en Local. Naranja: Ejecución con instancias M3. Verde: Ejecución con instancias C3.}
+  \label{fig:time}
+\end{figure}
+
+	A pesar de que con pocos procesos es mejor la máquina local es más rápida tiene una limitación bastante importante: sólo dispone de 4 cores. Gracias a StarCluster pudimos montar un cluster con varias máquinas de manera rápida lo que nos proporcionaba el uso de una cantidad mayor de cores. Como se ve en la gráfica de tiempos (figura \ref{fig:time}) en los cluster pudimos lanzar más procesos de manera paralela por eso el tiempo se acaba mejorando con respecto al tiempo conseguido en la máquina local. Una cosa que también se ve en la gráfica es que el tiempo de ejecución parece estabilizarse. Eso se explica mediante la ley de Amdahl\footnote{Ley de Amdahl: \url{http://es.wikipedia.org/wiki/Ley_de_Amdahl}} porque sólo mejoramos el tiempo de cómputo y no el tiempo de comunicación entre procesos una cosa que se puede ver perfectamente en las gráficas de eficiencia y \emph{Speedup} (figuras \ref{fig:eficiencia} y \ref{fig:speedup} respectivamente).
+
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.65\textwidth]{img/speedup.pdf}
+  \caption{Diferencia de speedup. Rojo: ejecución en Local. Naranja: Ejecución con instancias M3. Verde: Ejecución con instancias C3. Negro: Situación ideal.}
+  \label{fig:speedup}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+    \includegraphics[width=0.65\textwidth]{img/eficiencia.pdf}
+  \caption{Diferencia en la eficiencia. Rojo: ejecución en Local. Naranja: Ejecución con instancias M3. Verde: Ejecución con instancias C3. Negro: Situación ideal.}
+  \label{fig:eficiencia}
+\end{figure}
+
+	Si nos fijamos en la gráficas de la eficiencia podemos ver que hasta los 20 procesos la eficiencia en las instancias optimizadas para cálculo están muy cerca de la situación ideal esto se debe a que son las que Amazon te ofrece para HPC\cite{AmazonHPC}. Sin embargo para las instancias dedicadas para propósito general se ve una cosa que a priori es extraña. Esta situación en la que varía tanto la eficiencia se debe principalmente a que no podemos asegurar de que el procesador de la máquina física sólo lo estemos ejecutando nosotros.
+	
+	Con esto podemos concluir que para pocos problemas y pequeños lo recomendable es ejecutarlos en una máquina en local, pero para problemas paralelizables que necesiten mucho computo (o para una gran cantidad e programas) compensa el uso de un cluster de computación como el que se puede crear con la herramienta de StarCluster. Además es más recomendable usar las instancias optimizadas para cálculo en lugar de las de propósito general aunque las primeras sean más caras\footnote{Precio de las instancias: \url{http://aws.amazon.com/ec2/pricing/\#On-Demand\_Instances}} .
 
 \clearpage
-
 {\setlength{\parskip}{0mm} \listoftables } % Para que no ponga espacios entre las lineas de indice
 {\setlength{\parskip}{0mm} \listoffigures} % Para que no ponga espacios entre las lineas de indice
 
@@ -1096,6 +1144,10 @@ Open Grid Scheduler. Documentación del Grid Engine
 Documentación de cloudinit
 
 \url{https://cloudinit.readthedocs.org/en/latest/}
+\bibitem{AmazonHPC}
+Informática de alto rendimiento
+
+\url{http://aws.amazon.com/es/hpc/#/content/aws.amazon.com/es_ES/ec2/details}
 \end{thebibliography}
 
 \end{document}
