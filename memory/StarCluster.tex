@@ -76,7 +76,7 @@
 \maketitle % Pone titulo, autor
 \renewcommand{\abstractname}{Abstract} % El nombre que aparece al principio del abstract
 \begin{abstract}
-	En este documento se puede leer el trabajo realizado por el alumno para la práctica optativa de informática como servicio. El objetivo de este trabajo es poder mostrar con un código altamente paralelizable la importancia de disponer de una gran potencia de calculo empleando varias maquinas para la ejecucion de un programa. Ademas se implementara un sistema de colas de trabajo en el que se puedan poner procesos en una cola de ejecucion para ejecutarse de manera ordenada.
+	En este documento se puede leer el trabajo realizado por el alumno para la práctica optativa de informática como servicio. El objetivo de este trabajo es poder mostrar con un código altamente paralelizable la importancia de disponer de una gran potencia de cálculo empleando varias máquinas para la ejecución de un programa. Además se implementará un sistema de colas de trabajo en el que se puedan poner procesos en una cola de ejecución para ejecutarse de manera ordenada.
 \end{abstract}
 \renewcommand{\contentsname}{} % Lo que pone en el indice
 {\setlength{\parskip}{0mm} \tableofcontents} % Para que no ponga espacios entre las lineas de indice
@@ -91,7 +91,7 @@
 	
 \section{Programa paralelo}\label{sec:ParallelProgram}
 {\setlength{\parskip}{0mm}
-	La aplicación que se desarrollo en estre trabajo es una manera de escalar una imagen digital. Dicho proceso se hace mediante la siguiente transformación:
+	La aplicación que se desarrolló en este trabajo es una manera de escalar una imagen digital. Dicho proceso se hace mediante la siguiente transformación:
 \begin{equation}
 R(x, y) = A \left( \frac{x}{i_x}, \frac{y}{i_y} \right)
 \end{equation}
@@ -106,7 +106,7 @@ Los métodos más comunes de interpolar una imagen son los siguientes\cite{WOODS
 } \end{enumerate}
 }
 
-	La interpolación por el vecino más próximo resuelve el problema cogiendo el valor del pixel más próximo, siendo una manera sencilla de implementar y con una rápida ejecución pero consigue un efecto pixelado en los resultados. Para poder mejorar los resultados obtenidos se puede emplear la interpolación bilineal que para obtener el valor de un pixel que no existe usa los cuatro reales que están a su alrededor y calcula una media ponderada consiguiendo así un mejor resultado visual en la imagen de salida, pero con un tiempo de ejecución mucho mayor. Si aún así se necesita unos mejores resultados se puede emplear una interpolación bicúbica que requiere el uso de 16 pixels. El resultado que se consigue con la interpolación bicúbica es eliminar los efectos ``cuadriculados'' que se obtienen empleando con la interpolación bilineal, efecto que se consigue al emplear 16 pixels en vez de 4 al calcular el valor de un pixel resultante (a pesar del gran coste computacional que eso conlleva). Para poder ver el resultado obtenido con los distintos tipos de interpolación se puede ver el resultado en la figura \ref{fig:interpolationExample}.
+	La interpolación por el vecino más próximo resuelve el problema cogiendo el valor del pixel más próximo, siendo una manera sencilla de implementar y con una rápida ejecución pero consigue un efecto pixelado en los resultados. Para poder mejorar los resultados obtenidos se puede emplear la interpolación bilineal que para obtener el valor de un pixel que no existe usa los cuatro reales que están a su alrededor y calcula una media ponderada consiguiendo así un mejor resultado visual en la imagen de salida, pero con un tiempo de ejecución mucho mayor. Si aún así se necesita unos mejores resultados, se puede emplear una interpolación bicúbica que requiere el uso de 16 pixels. El resultado que se consigue con la interpolación bicúbica es eliminar los efectos ``cuadriculados'' que se obtienen empleando con la interpolación bilineal, efecto que se consigue al emplear 16 pixels, en vez de 4 al calcular el valor de un pixel resultante (a pesar del gran coste computacional que eso conlleva). Para poder ver el resultado obtenido con los distintos tipos de interpolación se puede ver el resultado en la figura \ref{fig:interpolationExample}.
 
 \begin{figure}[h]
   \centering
@@ -117,7 +117,7 @@ Los métodos más comunes de interpolar una imagen son los siguientes\cite{WOODS
 \end{figure}
 
 {\setlength{\parskip}{0mm}
-El algoritmo que se desarrollará en este trabajo es el de interpolación bicúbica, que como hemos dicho emplea dos interpolaciones cúbicas. En el caso de una sola dimensión la interpolación cúbica consiste en trazar una cúbica entre los 4 puntos más próximos (2 a la izquierda y 2 a la derecha).
+El algoritmo que se desarrollará en este trabajo es el de interpolación bicúbica, que como hemos dicho emplea dos interpolaciones cúbicas. En el caso de una sola dimensión, la interpolación cúbica consiste en trazar una cúbica entre los 4 puntos más próximos (2 a la izquierda y 2 a la derecha).
 \begin{equation}
 \label{eq:interpolacionCubica}
 f(x) = c_0 x^3 + c_1 x^2 + c_2 x + c_3
@@ -129,7 +129,7 @@ para aplicar la interpolación bicúbica se necesita hacer dos interpolaciones c
 }\end{enumerate}
 }
 
-En este tipo de interpolación un punto \emph{($p_x$, $p_y$)} emplea 16 pixels circundantes. Así tenemos que el valor del punto se puede calcular como una media ponderada de los 4x4 pixels circundantes. Para calcular el punto interpolado hay que realizar
+En este tipo de interpolación, un punto \emph{($p_x$, $p_y$)} emplea 16 pixels circundantes. Así tenemos que el valor del punto se puede calcular como una media ponderada de los 4x4 pixels circundantes. Para calcular el punto interpolado hay que realizar:
 \begin{equation}
 	A'(p_x ,p_y ) = \sum_{n = -1..2} \sum_{m=-1..2} A(i+n, j+m)P(n-a)P(b-m)
 \end{equation}
@@ -150,15 +150,15 @@ siendo
 
 
 
-Un problema que hay que abordar en cuanto al uso del tipo de interpolación es saber qué pixels se van emplear en caso de que se necesite calcular valores que estén próximos al borde, para ello se pueden usar dos métodos:{\setlength{\parskip}{0mm}
+Un problema que hay que abordar en cuanto al uso del tipo de interpolación, es saber qué pixels se van emplear en caso de que se necesite calcular valores que estén próximos al borde, para ello se pueden usar dos métodos:{\setlength{\parskip}{0mm}
 \begin{enumerate}{\setlength{\parskip}{0mm}
-	\item Usar ceros como valor siempre que se necesite un valor que esté fuere de la matriz de la imagen.
+	\item Usar ceros como valor, siempre que se necesite un valor que esté fuere de la matriz de la imagen.
 	\item Usar un efecto espejo en los bordes de la imagen.
 }\end{enumerate}
 }En este trabajo se implementará la segunda opción.
 
 \subsection{Creación del programa}
-Lo primero que se necesita es poder simular una imagen. Para ello se realiza una simulación tal y como se muestra en el siguiente trozo de código
+Lo primero que se necesita es poder simular una imagen. Para ello se realiza una simulación tal y como se muestra en el siguiente trozo de código:
 
 \begin{lstlisting}[style=C]
 void getImage(char *matrix, int height, int width) {
@@ -170,7 +170,7 @@ void getImage(char *matrix, int height, int width) {
 }
 \end{lstlisting}
 
-Al utilizar el método de escalado de una imagen descrito anteriormente nos encontraríamos con un problema al intentar hallar el valor de un pixel en los bordes de la imagen. Para solucionar este problema se llevó a cabo una de las soluciones encontradas en la literatura, se emplea el método de creación de bordes alrededor de la imagen con efecto espejo, añadiendo dos filas en la parte superior e inferior y también dos columnas a la izquierda y derecha de la imagen. 
+Al utilizar el método de escalado de una imagen descrito anteriormente, nos encontraríamos con un problema al intentar hallar el valor de un pixel en los bordes de la imagen. Para solucionar este problema se llevó a cabo una de las soluciones encontradas en la literatura, se emplea el método de creación de bordes alrededor de la imagen con efecto espejo, añadiendo dos filas en la parte superior e inferior y también dos columnas a la izquierda y derecha de la imagen. 
 En la figura \ref{fig:ejemploMatrices} se muestra un ejemplo representativo de la matriz original y la aumentada.
 
 \begin{figure}[h]
@@ -190,7 +190,7 @@ En la figura \ref{fig:ejemploMatrices} se muestra un ejemplo representativo de l
 \label{fig:ejemploMatrices}
 \end{figure}
 
-Una vez que tenemos la imagen original y se han creado los ``bordes'', se realiza el proceso de escalado con la siguiente función
+Una vez que tenemos la imagen original y se han creado los ``bordes'', se realiza el proceso de escalado con la siguiente función:
 
 \begin{lstlisting}[style=C]
 int ** getScale(char *mirror, char *result, int height, int width, int delay, float ix, float iy) {
@@ -234,23 +234,23 @@ int ** getScale(char *mirror, char *result, int height, int width, int delay, fl
 
 \subsection{Técnicas de paralelización utilizadas}
 \subsubsection{Paso de mensajes con MPI}
-Esta técnica se aplicó al bucle más externo. Con ella se pretendía dividir la carga computacional que crea este segmento de código entre varios procesadores, de manera que cada uno de ellos realizase una parte del cálculo, siendo así más rápida la terminación del programa. El motivo de realizar este reparto es dividir las filas de la imagen original para que cada proceso MPI se encargue de escalar su trozo de imagen tal y como se muestra en la figura \ref{fig:repartoFilas}\cite{MPICH2, OpenMPI}.
+Esta técnica se aplicó al bucle más externo. Con ella se pretendía dividir la carga computacional que crea este segmento de código entre varios procesadores, de manera que cada uno de ellos realizase una parte del cálculo, siendo así más rápida la terminación del programa. El motivo de realizar este reparto es dividir las filas de la imagen original para que cada proceso MPI se encargue de escalar su trozo de imagen, tal y como se muestra en la figura \ref{fig:repartoFilas}\cite{MPICH2, OpenMPI}.
 
 \begin{figure}[h]
         \centering
         \includegraphics[angle=0, height=0.3\textheight]{img/repartoFilas.pdf}
-        \caption{Imagen divida en filas. La región grisácea representa el espejo que se creo para dicha imagen. La imagen original esta formada por los píxels de color azul, naranja y rojo. Como se puede visualizar, la imagen está dividida en tres regiones, que son las que cada proceso MPI se encargaría de escalar.}
+        \caption{Imagen divida en filas. La región grisácea representa el espejo que se creó para dicha imagen. La imagen original está formada por los píxels de color azul, naranja y rojo. Como se puede visualizar, la imagen está dividida en tres regiones, que son las que cada proceso MPI se encargaría de escalar.}
         \label{fig:repartoFilas}
 \end{figure}
 
 \begin{figure}[h]
         \centering
         \includegraphics[angle=0, height=0.3\textheight]{img/repartoMPI.pdf}
-        \caption{Cada color de la imagen original (azul, naranja o rojo) son las filas que tendrá que escalar cada proceso, pero para realizar el escalado necesita unos ``bordes'' para poder realizar la interpolación. Lo que se enviará a cada proceso MPI está delimitado con un rectángulo de líneas punteadas (mostrando así que hay trozos de la imagen que puede estar en varios procesos).}
+        \caption{Cada color de la imagen original (azul, naranja o rojo) son las filas que tendrá que escalar cada proceso, pero para realizar el escalado necesita unos ``bordes'' para poder realizar la interpolación. Lo que se enviará a cada proceso MPI está delimitado con un rectángulo de líneas punteadas (mostrando así que hay trozos de la imagen que pueden estar en varios procesos).}
         \label{fig:repartoMPI}
 \end{figure}
 
-Para poder repartir la matriz de la imagen entre los distintos procesos se utilizaron las funciones \emph{MPI\_Scatterv} y \emph{MPI\_Gatherv}. El motivo de su uso fue que los segmentos de matriz enviados a cada proceso estaban solapados, y estas funciones permiten indicar al padre en qué punto empieza la parte de la matriz que debe enviar a un proceso en concreto, así como el tamaño a enviar. Además este motivo fue la razón de que el reparto de trabajo fuese consecutivo, porque en el caso de ser cíclico, se tendría que enviar toda la imagen a todos los procesos. En la figura \ref{fig:repartoMPI} se puede ver como lo que se envía a cada proceso MPI está solapado con lo que se envía a otros procesos.
+Para poder repartir la matriz de la imagen entre los distintos procesos se utilizaron las funciones \emph{MPI\_Scatterv} y \emph{MPI\_Gatherv}. El motivo de su uso fue que los segmentos de matriz enviados a cada proceso estaban solapados, y estas funciones permiten indicar al padre en qué punto empieza la parte de la matriz que debe enviar a un proceso en concreto, así como el tamaño a enviar. Además, este motivo fue la razón de que el reparto de trabajo fuese consecutivo, porque en el caso de ser cíclico, se tendría que enviar toda la imagen a todos los procesos. En la figura \ref{fig:repartoMPI} se puede ver como lo que se envía a cada proceso MPI está solapado con lo que se envía a otros procesos.
 
 El motivo de tener que enviar a cada proceso partes solapadas de la matriz se explica por el mismo motivo de la creación de la matriz espejo, es decir, la parte que debe calcular cada proceso también tiene pixels en los ``bordes'', que necesitarán sus pixels circundantes para calcular su nuevo valor.
 
@@ -326,7 +326,7 @@ void fill_aux_begin(int *fill, int size, int bytes) {
 \section{Ejecución del  programa paralelo en local}\label{sec:ejLocal}
 	Para empezar a ver los beneficios de la paralelización se puede ejecutar el programa en cualquier ordenador personal\footnote{Es necesario que tenga un procesador multicore para que se pueda apreciar la diferencia de tiempos}. La máquina en la que se va a probar tiene un procesador Intel Core i7-4820k\footnote{\url{http://ark.intel.com/es-es/products/77781/Intel-Core-i7-4820K-Processor-10M-Cache-up-to-3_90-GHz}} de 4 núcleos en el que está montado un sistema operativo Ubuntu 14.04.
 	
-	Lo primero que tenemos que hacer es instalar un versión de MPI
+	Lo primero que tenemos que hacer es instalar un versión de MPI:
 \begin{lstlisting}[style=minibash]
 $ wget http://www.open-mpi.org/software/ompi/v1.8/downloads/openmpi-1.8.3.tar.gz
 $ tar -xvf openmpi-1.8.3.tar.gz
@@ -338,7 +338,7 @@ $ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/$USER/.openmpi/lib' >> /ho
 $ source /home/$USER/.bashrc
 \end{lstlisting}
 
-	Una vez que tenemos configurado el entorno para ejecutar los programas en paralelo procedemos a compilar el programa con la siguiente instrucción
+	Una vez que tenemos configurado el entorno para ejecutar los programas en paralelo procedemos a compilar el programa con la siguiente instrucción:
 \begin{lstlisting}[style=minibash]
 $ mpicc paralelizado.c -lm -O3
 \end{lstlisting}
@@ -381,11 +381,11 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 
 \clearpage
 \section{Creación de un cluster en Amazon EC2 con StarCluster}\label{sec:InstallStarCluster}
-	En el apartados anteriores vimos que hay programas que se puede paralelizar y que se pueden obtener mejoras de tiempo con su ejecución paralela, pero que su ejecución debe de ser de manera ordenada para que no todos los trabajos se ejecuten a la vez y sobrecarguen la máquina.
+	En apartados anteriores vimos que hay programas que se puede paralelizar y que se pueden obtener mejoras de tiempo con su ejecución paralela, pero que su ejecución debe de ser de manera ordenada para que no todos los trabajos se ejecuten a la vez y sobrecarguen la máquina.
 
-	El objetivo de este trabajo es poder implementar un servicio de colas similar al que se puede acceder a las máquinas del CESGA. Estas colas son  sistemas de acceso ordenado de los distintos trabajos a los recursos de un servidor, de tal manera que su finalidad es permitir que los recursos se compartan de forma equitativa entre todos los usuarios y que el servidor no se sobrecargue intentando ejecutar todos los programas a la vez. Cundo los trabajos que se encuentran en cola exceden los recursos disponibles en el servidor, un número determinado de los mismos pueden entrar en ejecución, mientras que el resto debe esperar a que tenga suficientes recursos disponibles.
+	El objetivo de este trabajo es poder implementar un servicio de colas similar al que se puede acceder a las máquinas del CESGA. Estas colas son  sistemas de acceso ordenado de los distintos trabajos a los recursos de un servidor, de tal manera que su finalidad es permitir que los recursos se compartan de forma equitativa entre todos los usuarios y que el servidor no se sobrecargue intentando ejecutar todos los programas a la vez. Cuando los trabajos que se encuentran en cola exceden los recursos disponibles en el servidor, un número determinado de los mismos pueden entrar en ejecución, mientras que el resto debe esperar a que tenga suficientes recursos disponibles.
 
-	Para conseguir este objetivo se usará StarCluster el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube adecuado para programas distribuidos y paralelos. La estructura que monta se puede ver en la figura \ref{fig:StarClusterOverview} donde se crea un nodo \emph{Master} y varios nodos \emph{Worker}.
+	Para conseguir este objetivo se usará StarCluster, el cual es un conjunto de herramientas para automatizar y simplificar la creación, configuración y gestión de máquinas virtuales usando Amazon EC2. StarCluster nos permitirá crear un entorno de computación en la nube, adecuado para programas distribuidos y paralelos. La estructura que monta se puede ver en la figura \ref{fig:StarClusterOverview} donde se crea un nodo \emph{Master} y varios nodos \emph{Worker}.
 
 \begin{figure}[h]
   \centering
@@ -395,7 +395,7 @@ $ mpirun -np 4 ./a.out 1500 1500 4 4
 \end{figure}
 
 \subsection{Instalando StarCluster}\label{sec:InstallStarCluster}
-	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo y instalar StarCluster basta con introducir en la terminal los siguientes comandos\cite{InstallingStarCluster}:
+	Para la instalación de StarCluster basta con descargar la última versión de \url{https://pypi.python.org/pypi/StarCluster} que actualmente es la 0.95.6. Para descargar el archivo e instalar StarCluster basta con introducir en la terminal los siguientes comandos\cite{InstallingStarCluster}:
 \begin{lstlisting}[style=minibash]
 $ curl -O https://pypi.python.org/packages/source/S/StarCluster/StarCluster-0.95.6.tar.gz
 $ tar xvzf StarCluster-0.95.6.tar.gz
@@ -406,13 +406,13 @@ $ sudo python setup.py install
 \end{lstlisting}
 
 \subsection{Creando el archivo de configuración para StarCluster}
-	El primer paso para la creación de un cluster es definir un archivo de configuración en el que se podrán indicar todos los parámetros necesarios. Por defecto el archivo de configuración tiene que estar en \emph{\$HOME/.starcluster/config} pero se le puede cambiar la localización con la variable de entorno \emph{STARCLUSTER\_CONFIG}\cite{StarClusterUserManual}.
+	El primer paso para la creación de un cluster es definir un archivo de configuración en el que se podrá indicar todos los parámetros necesarios. Por defecto, el archivo de configuración tiene que estar en \emph{\$HOME/.starcluster/config}, pero se le puede cambiar la localización con la variable de entorno \emph{STARCLUSTER\_CONFIG}\cite{StarClusterUserManual}.
 \begin{lstlisting}[style=minibash]
 $ echo "export STARCLUSTER_CONFIG=\"$PWD/starclusterconfig\"" >> $HOME/.bash_profile 
 $ source $HOME/.bash_profile
 \end{lstlisting}
 
-Ahora procederemos a crear el archivo de configuración con el comando \emph{starcluster help} y como el fichero de configuración nos mostrará diferentes opciones. Nosotros pulsaremos la opción 2 para que nos cree un archivo de configuración por defecto donde indica la variable de entorno \emph{STARCLUSTER\_CONFIG}.
+Ahora procederemos a crear el archivo de configuración con el comando \emph{starcluster help} y nos mostrará diferentes opciones. Nosotros pulsaremos la opción 2 para que nos cree un archivo de configuración por defecto, donde indica la variable de entorno \emph{STARCLUSTER\_CONFIG}.
 \begin{lstlisting}[style=minibash]
 $ starcluster help
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -434,7 +434,7 @@ Please enter your selection: 2
 
 	El primer paso que debemos hacer es la configuración de las credenciales de AWS en el fichero de configuración. Para ello dentro del archivo nos movemos a la sección \emph{[aws\_info]}. Las credenciales se han de indicar en los parámetros \emph{AWS\_ACCESS\_KEY\_ID}, \emph{AWS\_SECRET\_ACCESS\_KEY} y \emph{AWS\_USER\_ID}.
 	
-	Además de indicar las credenciales de AWS también tenemos que indicar el ``par de claves'' de Amazon EC2 en la sección [keypair] . Esto es necesario para que StarCluster se pueda conectar a las instancias y pueda configurarlas. se puede crear varias secciones de par de claves. En la siguiente sección de configuración se muestra un ejemplo de la configuración
+	Además de indicar las credenciales de AWS también tenemos que indicar el ``par de claves'' de Amazon EC2 en la sección [keypair]. Esto es necesario para que StarCluster se pueda conectar a las instancias y pueda configurarlas. Se puede crear varias secciones de par de claves. En la siguiente sección de configuración se muestra un ejemplo de la configuración:
 \begin{lstlisting}
 [key mykey1]
  KEY_LOCATION=./Keypair_AWS/01-francisco-cedron-keypair.pem
@@ -442,7 +442,7 @@ Please enter your selection: 2
  KEY_LOCATION=./Keypair_AWS/02-francisco-cedron-keypair.pem
 \end{lstlisting}
 
-	A pesar de que en la sección [aws\_info] se tienen que indicar la configuración de las credenciales de AWS, en esta sección se puede configurar más cosas como la región donde estarán las instancias o la región donde está el servicio de S3 para el almacenamiento. Para indicar la región donde se lanzaran las instancias hay que indicarlos con los parámetros \emph{aws\_region\_name} y \emph{aws\_region\_host} en la tabla \ref{tab:ec2-endpoint} se muestra como se deben modificar actualmente esos valores aunque en la dirección \url{http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region} aparece los valores más recientes que pueden tomar. Para indicar el lugar donde se aloja el servicio que se usará en Amazon S3 hay que modificar el parámetro \emph{aws\_s3\_host} con algunos de los valores de la tabla \ref{tab:s3-endpoint} aunque en la dirección \url{http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region} aparece los valores más recientes que pueden tomar. La opción que coge por defecto \emph{aws\_s3\_host} si no se especifica ningún valor es \emph{s3.amazonaws.com} que se usará la región del Norte de Virginia o la del Pacífico Noroeste.
+	A pesar de que en la sección [aws\_info] se tienen que indicar la configuración de las credenciales de AWS, en esta sección se puede configurar más cosas como la región donde estarán las instancias o la región donde está el servicio de S3 para el almacenamiento. Para indicar la región donde se lanzarán las instancias, hay que indicarlos con los parámetros \emph{aws\_region\_name} y \emph{aws\_region\_host} en la tabla \ref{tab:ec2-endpoint} se muestra como se deben modificar actualmente esos valores, aunque en la dirección \url{http://docs.aws.amazon.com/general/latest/gr/rande.html#ec2_region} aparecen los más recientes. Para indicar el lugar donde se aloja el servicio que se usará en Amazon S3, hay que modificar el parámetro \emph{aws\_s3\_host} con algunos de los valores de la tabla \ref{tab:s3-endpoint}, aunque en la dirección \url{http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region} aparecen los valores más recientes que pueden tomar. La opción que coge por defecto \emph{aws\_s3\_host} si no se especifica ningún valor, es \emph{s3.amazonaws.com} que indica que se usará la región del Norte de Virginia o la del Pacífico Noroeste.
 
 \begin{table}[h]
 	\begin{center}
@@ -460,8 +460,8 @@ EU (Ireland)                       & eu-west-1         &  ec2.eu-west-1.amazonaw
 EU (Frankfurt)                   & eu-central-1      & ec2.eu-central-1.amazonaws.com \\ \hline
 Asia Pacific (Singapore)     & ap-southeast-1 & ec2.ap-southeast-1.amazonaws.com \\ \hline
 Asia Pacific (Sydney)         & ap-southeast-2 & ec2.ap-southeast-2.amazonaws.com \\ \hline
-Asia Pacific (Tokio)            & ap-northeast-1 & ec2.ap-northeast-1.amazonaws.com \\ \hline
-South America (Sao Paulo) & sa-east-1         & ec2.as-east-1.amazonaws.com \\ \hline
+Asia Pacific (Tokyo)            & ap-northeast-1 & ec2.ap-northeast-1.amazonaws.com \\ \hline
+South America (São Paulo) & sa-east-1         & ec2.as-east-1.amazonaws.com \\ \hline
 		\end{tabular}
 		\label{tab:ec2-endpoint}
 	\end{center}
@@ -481,17 +481,17 @@ EU (Ireland)                       &  s3-eu-west-1.amazonaws.com \\ \hline
 EU (Frankfurt)                   & s3-eu-central-1.amazonaws.com \\ \hline
 Asia Pacific (Singapore)     & s3-ap-southeast-1.amazonaws.com \\ \hline
 Asia Pacific (Sydney)         & s3-ap-southeast-2.amazonaws.com \\ \hline
-Asia Pacific (Tokio)            & s3-ap-northeast-1.amazonaws.com \\ \hline
-South America (Sao Paulo) & s3-as-east-1.amazonaws.com \\ \hline
+Asia Pacific (Tokyo)            & s3-ap-northeast-1.amazonaws.com \\ \hline
+South America (São Paulo) & s3-as-east-1.amazonaws.com \\ \hline
 		\end{tabular}
 		\label{tab:s3-endpoint}
 	\end{center}
 \end{table}
 
-	Dentro de la sección de [aws\_info] también se puede especificar la configuración de para usar un proxy para conectarse a AWS. Para ello hay que incluir los siguientes parámetros
+	Dentro de la sección de [aws\_info] también se puede especificar la configuración para usar un proxy para conectarse a AWS. Para ello hay que incluir los siguientes parámetros:
 {\setlength{\parskip}{0mm} \begin{itemize}
 {\setlength{\parskip}{0mm}
-	\item 	\emph{aws\_proxy}: Es el nombre del host proxy que se empleara
+	\item 	\emph{aws\_proxy}: Es el nombre del host proxy que se empleará
 	\item 	\emph{aws\_proxy\_port}: Es el número de puerto que utilizará el proxy para conectarse
 	\item 	\emph{aws\_proxy\_user}: Es el nombre de usuario para utilizar cuando se autentique con el proxy
 	\item 	\emph{aws\_proxy\_pass}: Es el contraseña a usar cuando se autentica 
@@ -507,7 +507,7 @@ volume_id=vol-c8888888
 mount_path=/scratch
 \end{lstlisting}
 
-	Cuando se inicia el cluster cada nodo se añade a un grupo de seguridad común que está creado por StarCluster y tiene un nombre de la forma @sc-\textbf{cluster\_tag} donde \textbf{cluster\_tag} es el nombre que se pasa por parametro al iniciar el cluster. Por defecto agrega un permiso para este grupo de seguridad que permite el acceso al puerto ssh (22) desde cualquier dirección ip. Esta regla es necesaria para que StarCluster pueda conectarse a las instancias y configurarlas. Si necesita añadir más reglas en el grupo de seguridad del cluster se puede hacer en el fichero de configuración en la sección [permission].  En la siguiente sección del archivo de configuración se muestra un ejemplo:
+	Cuando se inicia el cluster, cada nodo se añade a un grupo de seguridad común que está creado por StarCluster y tiene un nombre de la forma @sc-\textbf{cluster\_tag} donde \textbf{cluster\_tag} es el nombre que se pasa por parámetro al iniciar el cluster. Por defecto agrega un permiso para este grupo de seguridad, que permite el acceso al puerto ssh (22) desde cualquier dirección ip. Esta regla es necesaria para que StarCluster pueda conectarse a las instancias y configurarlas. Si necesita añadir más reglas en el grupo de seguridad del cluster, se puede hacer en el fichero de configuración en la sección [permission].  En la siguiente sección del archivo de configuración se muestra un ejemplo:
 \begin{lstlisting}
 [permission www]
  from_port = 80
@@ -526,16 +526,16 @@ to_port = 53
 	Antes de crear un cluster con StarCluster sobre Amazon EC2, se tiene que especificar una plantilla que contenga toda la configuración necesaria para la creación del cluster. Para ello hay que crear una sección \emph{[cluster]} en el archivo de configuración. Una vez que tienes una plantilla definida para el cluster se pueden lanzar diversos clusters usando la misma plantilla. Las parámetros de configuración son los siguientes\footnote{Los parámetros que aparecen en negrita son obligatorios}:
 {\setlength{\parskip}{0mm} \begin{itemize}
 {\setlength{\parskip}{0mm}
-	\item 	\textbf{\emph{keyname}}: Es el ``par de claves'' que se usara para el cluster. Para ello tiene que estar definido en la seccion [keypair]
+	\item 	\textbf{\emph{keyname}}: Es el ``par de claves'' que se usará para el cluster. Para ello tiene que estar definido en la sección [keypair]
 	\item \textbf{\emph{cluster\_size}}: El número de nodos que tendrá el cluster (se incluye también el nodo maestro).
-	\item \textbf{\emph{node\_image\_id}}: El identificador del AMI que usaran los nodos de trabajo
-	\item \textbf{\emph{node\_instance\_type}}: Es el tipo de instancia que usaran los nodos de trabajo
+	\item \textbf{\emph{node\_image\_id}}: El identificador del AMI que usarán en los nodos de trabajo
+	\item \textbf{\emph{node\_instance\_type}}: Es el tipo de instancia que usarán en los nodos de trabajo
 	\item \emph{cluster\_user}: El usuario que crear el cluster (por defecto es \emph{sgeadmin})
 	\item \emph{cluster\_shell}: El shell del cluster (por defecto es \emph{bash}, aunque las opciones que puedes especificar son \emph{bash}, \emph{zsh}, \emph{csh}, \emph{ksh}, \emph{tcsh})
-	\item \emph{dns\_prefix}: Si se especifica este valor el nombre dns de los nodos empezaran con el valor que se especifique aquí
+	\item \emph{dns\_prefix}: Si se especifica este valor el nombre dns de los nodos empezarán con el valor que se especifique aquí
 	\item \emph{master\_image\_id}: El identificador de la AMI que se usará para el nodo master (si no se especifica se usa el que se haya indicado en node\_image\_id)
 	\item \emph{master\_instance\_type}: Es el tipo de instancia que se usará para el nodo master (si no se especifica se usa el que se haya indicado en node\_instance\_type)
-	\item \emph{userdata\_scripts}: Lista e los scripts que se usarán cuando se lancen las instancias
+	\item \emph{userdata\_scripts}: Lista de los scripts que se usarán cuando se lancen las instancias
 	\item \emph{volumes}: Lista de volúmenes EBS para adjuntar al servicio NFS compartido en el cluster (cada volumen tendrá que estar especificado en la sección [volumen])
 	\item \emph{plugin}: Lista de plugins para StarCluster a usar cuando se lance el cluster (cada plugin tiene que estar definido en la sección [plugin])
 	\item \emph{permissions}: Lista de permisos a aplicar al grupo de seguridad del cluster (cada permiso tendrá que estar especificado en la sección [permissions])
@@ -566,18 +566,18 @@ keyname = mykeypair2
 cluster_size = 10
 node_instance_type = c1.xlarge
 \end{lstlisting}
-	Como en el archivo de configuración se pueden tener varias plantillas de cluster es posible definir una como predeterminada que se hace en la sección [global] de la siguiente manera:
+	Como en el archivo de configuración se pueden tener varias plantillas de cluster, es posible definir una como predeterminada, que se hace en la sección [global] de la siguiente manera:
 \begin{lstlisting}
 [global]
 default_template = proveCluster
 \end{lstlisting}
 
-	Las nuevas cuentas de AWS una utilizan VPC por defecto y  StarCluster soporta esta configuración. Sin embargo si ya se quiere usar una VPC ya personalizada por el usuario se puede especificar en el parámetro \emph{subnet\_id}. Por defecto StarCluster no asigna IP públicas todas las instancias y esa es la razón por la que crea todas las instancias en una misma VPC para poder conectarse a todos los nodos. StarCluster no asigna direcciones IP públicas por dos sencillas razones:
+	Las nuevas cuentas de AWS utilizan una VPC por defecto y  StarCluster soporta esta configuración. Sin embargo, si ya se quiere usar una VPC ya personalizada por el usuario, se puede especificar en el parámetro \emph{subnet\_id}. Por defecto StarCluster no asigna IP públicas a todas las instancias y esa es la razón por la que crea todas las instancias en una misma VPC, para poder conectarse a todos los nodos. StarCluster no asigna direcciones IP públicas por dos sencillas razones:
 {\setlength{\parskip}{0mm}
 \begin{enumerate}
 {\setlength{\parskip}{0mm}
 	\item Eso ``abriría'' la VPC a internet, lo que es un riesgo para la seguridad
-	\item Se requiere una configuración especial del VPC.
+	\item Se requiere una configuración especial del VPC
 }
 \end{enumerate} 
 }
@@ -660,7 +660,7 @@ SETUP_CLASS = starcluster.plugins.mpich2.MPICH2Setup
 
 \clearpage
 \subsection{Usando el cluster}
-	Una vez tenemos creado el archivo de configuración toca crear el cluster con el comando \emph{starcluster start namecluster}, donde \emph{namecluster} es una etiqueta que le damos al cluster que vamos a crear. A continuación vemos la salida que nos devolvió el comando y en las imágenes \ref{fig:ClusterDePruebasSG} y \ref{fig:ClusterDePruebasNODES} podemos ver el grupo de seguridad y las instancias en el panel de Amazon EC2 que se crearon para el cluster.
+	Una vez creado el archivo de configuración, toca crear el cluster con el comando \emph{starcluster start namecluster}, donde \emph{namecluster} es una etiqueta que le damos al cluster que vamos a crear. A continuación, vemos la salida que nos devolvió el comando, y en las imágenes \ref{fig:ClusterDePruebasSG} y \ref{fig:ClusterDePruebasNODES} podemos ver el grupo de seguridad y las instancias en el panel de Amazon EC2 que se crearon para el cluster.
 \begin{lstlisting}[style=miniBash]
 $ starcluster start ClusterDePruebas
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -754,7 +754,7 @@ cluster.
 \begin{figure}[h]
   \centering
     \includegraphics[width=0.75\textwidth]{img/ClusterDePruebasSG.png}
-  \caption{El grupo de seguridad que creo StarCluster para el cluster}
+  \caption{El grupo de seguridad que creó StarCluster para el cluster}
   \label{fig:ClusterDePruebasSG}
 \end{figure}
 \begin{figure}[h]
@@ -764,7 +764,7 @@ cluster.
   \label{fig:ClusterDePruebasNODES}
 \end{figure}
 
-	Una vez tenemos creado el cluster podemos consultar los cluster que hemos creado con el siguiente comando:
+	Una vez tenemos creado el cluste,r podemos consultar los clusters que hemos creado con el siguiente comando:
 \begin{lstlisting}[style=miniBash]
 $ starcluster listclusters
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -789,7 +789,7 @@ Cluster nodes:
 Total nodes: 4
 \end{lstlisting}
 
-	Aunque podemos mirar a través del portal web que se ha creado en cada momento StarCluster nos ofrece herramientas para conectarnos al cluster. Por ejemplo para conectarnos como root bastaría con usar el comando \emph{starcluster sshmaster ClusterDePruebas} done el primer argumento indica que nos queremos conectar al nodo máster y el segundo es a que cluster nos queremos conectar. Para conectarnos con el usuario que especificamos en el archivo de configuración (\emph{sgeadmin}) tendremos que usar el siguiente comando
+	Aunque podemos mirar a través del portal web que se ha creado en cada momento, StarCluster nos ofrece herramientas para conectarnos al cluster. Por ejemplo, para conectarnos como root bastaría con usar el comando \emph{starcluster sshmaster ClusterDePruebas}, donde el primer argumento indica que nos queremos conectar al nodo master y el segundo es a qué cluster nos queremos conectar. Para conectarnos con el usuario que especificamos en el archivo de configuración (\emph{sgeadmin}), tendremos que usar el siguiente comando:
 \begin{lstlisting}[style=miniBash]
 $ starcluster sshmaster -u sgeadmin ClusterDePruebas
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -880,7 +880,7 @@ sgeadmin@master:~$ logout
 Connection to ec2-54-175-7-72.compute-1.amazonaws.com closed.
 \end{lstlisting}
 
-	Para pasar información al cluster podemos usar el comando \emph{starcluster put clustertag pathlocal pathremote} donde \emph{clustertag} es la etiqueta que le pusimos al cluster, \emph{pathlocal} es la ruta del archivo/directorio\footnote{Tanto el comando \emph{starcluster put} como \emph{starcluster get} soportan recursividad} en el equipo local y \emph{pathremote} es la ruta donde situar el archivo/directorio en el servidor. Por defecto este comando opera en el nodo master como root, pero se puede usar las opciones \emph{--user username} donde \emph{username} es el nombre de usuario que realizará la operación y con \emph{--node nodename} especificamos mediante el parámetro \emph{nodename} el nombre del nodo contra el cual se realiza la operación. Para recuperar información del servidor es con el comando \emph{starcluster get clustertag pathremote pathlocal} y tiene un funcionamiento análogo a \emph{starcluster put} admitiendo las mismas opciones.
+	Para pasar información al cluster, podemos usar el comando \emph{starcluster put clustertag pathlocal pathremote} donde \emph{clustertag} es la etiqueta que le pusimos al cluster, \emph{pathlocal} es la ruta del archivo/directorio\footnote{Tanto el comando \emph{starcluster put} como \emph{starcluster get} soportan recursividad} en el equipo local y \emph{pathremote} es la ruta donde situar el archivo/directorio en el servidor. Por defecto, este comando opera en el nodo master como root, pero se pueden usar las opciones \emph{--user username} donde \emph{username} es el nombre de usuario que realizará la operación y con \emph{--node nodename} especificamos mediante el parámetro \emph{nodename} el nombre del nodo contra el cual se realiza la operación. Para recuperar información del servidor es con el comando \emph{starcluster get clustertag pathremote pathlocal} y tiene un funcionamiento análogo a \emph{starcluster put} admitiendo las mismas opciones.
 \begin{lstlisting}[style=miniBash]
 $ starcluster put ClusterDePruebas --user sgeadmin /tmp/paralelizado.c code.c
 StarCluster  - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -898,7 +898,7 @@ $ diff /tmp/paralelizado.c /tmp/code.c
 $
 \end{lstlisting}
 
-	StarCluster proporciona una instrucción para ver la lista de clusters que tenemos en ese momento ejecutandose. Para ver cuales son basta con introducir el siguiente comando:
+	StarCluster proporciona una instrucción para ver la lista de clusters que tenemos en ese momento ejecutándose. Para ver cuáles son, basta con introducir el siguiente comando:
 \begin{lstlisting}[style=miniBash]	
 $ starcluster listclusters
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -924,7 +924,7 @@ Total nodes: 4
 
 \end{lstlisting}
 	
-	Para finalizar el cluster basta con introducir la siguiente instrucción:
+	Para finalizar el cluster, basta con introducir la siguiente instrucción:
 \begin{lstlisting}[style=miniBash]
 $ starcluster terminate ClusterDePruebas
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -943,7 +943,7 @@ Terminate EBS cluster ClusterDePruebas (y/n)? y
 \end{lstlisting}
 
 \subsubsection{Iniciando un cluster a partir de una plantilla que no sea la de por defecto}
-	En el archivo de configuración pueden existir varias plantillas para la creación de un cluster, pero a la hora de ejecutar el comando \emph{starcluster start clustername} se utiliza la plantilla que se estableció por defecto dentro de la sección [global]. Si necesitamos crear otra plantilla tendremos que especificarlo  con el parámetro \emph{--cluster-template=CLUSTER\_TEMPLATE} donde \emph{CLUSTER\_TEMPLATE} es la plantilla que queremos cargar. El siguiente comando inicia la plantilla \emph{mediumcluster}:
+	En el archivo de configuración pueden existir varias plantillas para la creación de un cluster, pero a la hora de ejecutar el comando \emph{starcluster start clustername} se utiliza la plantilla que se estableció por defecto dentro de la sección [global]. Si necesitamos crear otra plantilla tendremos que especificarlo  con el parámetro \emph{--cluster-template=CLUSTER\_TEMPLATE}, donde \emph{CLUSTER\_TEMPLATE} es la plantilla que queremos cargar. El siguiente comando inicia la plantilla \emph{mediumcluster}:
 \begin{lstlisting}[style=miniBash]
 $ starcluster start --cluster-template=mediumcluster mpicluster
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -1046,9 +1046,9 @@ cluster.
 \section{Ejecución del programa paralelo en un cluster}\label{sec:ejStarCluster}
 
 \subsection{Tipo de instancias de propósito general}\label{sec:ejM3}
-	Para probar la ejecución del programa paralelo se usado una configuración con 10 nodos cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterM} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
+	Para probar la ejecución del programa paralelo se ha usado una configuración con 10 nodos, cuyo tipo de instancia es el \emph{m3.xlarge} que tienen 4 VCPUs cada una. En la tabla \ref{tab:resultadosClusterM} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
 
-	Si nos fijamos en los resultados obtenidos en la tabla \ref{tab:resultadosClusterM} puede llamar la atención como varían los valores y que no siguen una distribución como la que aparece en los resultados al ejecutarlos en local. Podemos ver que el speedup que se consigue al usar cinco procesos es superior al lo que sería lo óptimo. Esto se debe a que las instancias que se ejecutan son máquinas virtuales de las que tenemos el control pero no de la máquina física sobre la que se ejecuten pudiendo haber otras instancias de otros usuarios ejecutándose en la misma máquina física de tal manera que no tenemos la CPU física para nuestros procesos como pasaba en el caso de ejecutarse en local. Esto es lo que puede explicar los datos atípicos que parecen mejorar o empeorar los resultados. Además para los casos en los que los resultados parecen que empeoran mucho esto se debe a la comunicación entre procesos de tal manera que si los datos tienen que viajar entre máquinas es muy probable que exista otro tráfico que haga que los mensajes de comunicación del programa no se entreguen todo lo rápido que podría ser.
+	Si nos fijamos en los resultados obtenidos en la tabla \ref{tab:resultadosClusterM}, puede llamar la atención como varían los valores y que no siguen una distribución como la que aparece en los resultados al ejecutarlos en local. Podemos ver que el speedup que se consigue al usar cinco procesos es superior a lo que sería lo óptimo. Esto se debe a que las instancias que se ejecutan son máquinas virtuales de las que tenemos el control, pero no de la máquina física sobre la que se ejecuten pudiendo haber otras instancias de otros usuarios ejecutándose en la misma máquina física de tal manera que no tenemos la CPU física para nuestros procesos como pasaba en el caso de ejecutarse en local. Esto es lo que puede explicar los datos atípicos que parecen mejorar o empeorar los resultados. Además,  los casos en los que los resultados parecen que empeoran mucho  se debe a la comunicación entre procesos de tal manera que si los datos tienen que viajar entre máquinas, es muy probable que exista otro tráfico que haga que los mensajes de comunicación del programa no se entreguen todo lo rápido que podría ser.
 	
 %http://aws.amazon.com/es/ec2/instance-types/#instance-type-matrix
 \begin{table}[h]
@@ -1076,13 +1076,13 @@ cluster.
 \end{table}
 
 \subsection{Tipo de instancias optimizadas para cálculos}\label{sec:ejC3}
-	Para probar la ejecución del programa paralelo se usado una configuración con 5 nodos cuyo tipo de instancia es el \emph{c3.2xlarge} que tienen 8 VCPUs cada una. En la tabla \ref{tab:resultadosClusterC} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
+	Para probar la ejecución del programa paralelo se ha usado una configuración con 5 nodos, cuyo tipo de instancia es el \emph{c3.2xlarge} que tienen 8 VCPUs cada una. En la tabla \ref{tab:resultadosClusterC} se pueden ver los resultados que se obtuvieron al ejecutar el mismo programa con las mismas entradas en el cluster formado en Amazon EC2 con StarCluster.
 
-	Podemos ver que la eficiencia se mantiene casi constante durante las primeras ejecuciones mientras que  a partir de los 30 procesos empieza a bajar considerablemente. Esto se debe a que las llamadas que se usan de MPI son llamadas colectivas donde todos los procesos se tienen que esperar a que todos los demás lleguen al mismo punto (como si fuese una llamada \emph{MPI\_Barrier}) para empezar a realizar la comunicación, y con 30 procesos ya es una cantidad considerable de procesos para sincronización (hay que darse cuenta de que la sincronización no tiene porque ser dentro de la misma máquina si no que puede ser con otras máquinas con lo que hay que hacer la sincronización a traves de la red).
+	Podemos ver que la eficiencia se mantiene casi constante durante las primeras ejecuciones mientras, que a partir de los 30 procesos empieza a bajar considerablemente. Esto se debe a que las llamadas que se usan de MPI son llamadas colectivas donde todos los procesos tienen que esperar a que todos los demás lleguen al mismo punto (como si fuese una llamada \emph{MPI\_Barrier}) para empezar a realizar la comunicación, y con 30 procesos ya es una cantidad considerable de procesos para sincronización (hay que darse cuenta de que la sincronización no tiene porque ser dentro de la misma máquina sino que puede ser con otras máquinas con lo que hay que hacer la sincronización a través de la red).
 
 \begin{table}[h]
 	\begin{center}
-		\caption{Resultados de ejecutar el programa paralelo en un cluster en Amazon EC2 usando tipos instancias de optimizadas para computo.}
+		\caption{Resultados de ejecutar el programa paralelo en un cluster en Amazon EC2 usando tipos de instancias  optimizadas para computo.}
 		\begin{tabular}{|c|c|c|c|}
 \hline
 \textbf{Procesos} &
@@ -1110,7 +1110,7 @@ cluster.
 \subsection{Problemas al instalar StarCluster}
 
 \subsubsection{Instalación en MAC OS X}
-	StarCluster está disponible mediante \emph{PyPI} (Python Package Index) cuya herramienta se encuentra disponible tanto para Mac OS X como para sistemas Linux. Debido a esto probamos a instalarlo en Mac OS X 10.9.4 como muestra en la sección \ref{sec:InstallStarCluster}, con lo que después de algún mensaje de warning la instalación se completo sin dar ningún mensaje de warning. Si configuramos el archivo de configuración para lanzar un cluster y intentabamos crearlo nos daba el siguiente mensaje:
+	StarCluster está disponible mediante \emph{PyPI} (Python Package Index), cuya herramienta se encuentra disponible tanto para Mac OS X como para sistemas Linux. Debido a esto, probamos a instalarlo en Mac OS X 10.9.4 como muestra en la sección \ref{sec:InstallStarCluster}, con lo que después de algún mensaje de warning, la instalación se completo sin dar ningún mensaje de error. Si configuramos el archivo de configuración para lanzar un cluster y intentábamos crearlo, nos daba el siguiente mensaje:
 \begin{lstlisting}[style=miniBash]
 $ starcluster start pruebas
 StarCluster - (http://star.mit.edu/cluster) (v. 0.95.6)
@@ -1123,7 +1123,7 @@ Please submit bug reports to starcluster@mit.edu
 !!! ERROR - key_location '/Users/flanciskinho/.ssh/AWS/mykey.rsa' does
 !!! ERROR - not exist
 \end{lstlisting}
-Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo de configuración no existe en Amazon EC2. Se probo crear la clave de tres formas distintas pero consiguiendo el mismo mensaje
+Lo que nos indica el mensaje es que la clave que se ha indicado en el archivo de configuración no existe en Amazon EC2. Se probó crear la clave de tres formas distintas, pero consiguiendo siempre el mismo mensaje:
 {\setlength{\parskip}{0mm}\begin{enumerate}
 {\setlength{\parskip}{0mm}
 	\item Creando la clave mediante el panel web de Amazon EC2
@@ -1132,10 +1132,10 @@ Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo d
 }
 \end{enumerate}}
 
-	La solución paso por instalar StarCluster en un sistema basado en linux (más concretamente en Ubuntu 14.04).
+	La solución pasó por instalar StarCluster en un sistema basado en linux (más concretamente en Ubuntu 14.04).
 
 \subsection{Resultados}\label{sec:ConclusionResultados}
-	Las pruebas para la ejecución del problema propuesto en esta práctica se han realizado con tres configuraciones diferentes
+	Las pruebas para la ejecución del problema propuesto en esta práctica se han realizado con tres configuraciones diferentes:
 {\setlength{\parskip}{0mm}\begin{enumerate}
 {\setlength{\parskip}{0mm}
 	\item Una configuración en una máquina local (sección \ref{sec:ejLocal}).
@@ -1143,7 +1143,7 @@ Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo d
 	\item Una configuración con un cluster en Amazon EC2 con instancias optimizadas para cálculo (sección \ref{sec:ejC3}).
 }
 \end{enumerate}}
-	Si comparamos los tiempos de las ejecuciones en ambas configuraciones (véase la figura \ref{fig:time}) podemos ver que para una cantidad menos de procesos se ejecuta más rápido en la máquina local que usando las instancias de Amazon EC2 lo cual es lógico por la máquina local tiene una velocidad de reloj de 3,7 GHz mientras que las instancias para propósito general tienen una velocidad de 2,5 GHZ y las optimizadas para cálculo 2,8 GHz\footnote{ Velocidad de reloj para los distintos tipos de instancia de Amazon EC2: \url{http://aws.amazon.com/es/ec2/instance-types/\#instance-type-matrix}}.
+	Si comparamos los tiempos de las ejecuciones en ambas configuraciones (véase la figura \ref{fig:time}), podemos ver que para una cantidad menor de procesos se ejecuta más rápido en la máquina local que usando las instancias de Amazon EC2, lo cual es lógico porque la máquina local tiene una velocidad de reloj de 3,7 GHz mientras que las instancias para propósito general tienen una velocidad de 2,5 GHZ y las optimizadas para cálculo 2,8 GHz\footnote{ Velocidad de reloj para los distintos tipos de instancia de Amazon EC2: \url{http://aws.amazon.com/es/ec2/instance-types/\#instance-type-matrix}}.
 
 
 \begin{figure}[h]
@@ -1153,7 +1153,7 @@ Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo d
   \label{fig:time}
 \end{figure}
 
-	A pesar de que con pocos procesos es mejor la máquina local es más rápida tiene una limitación bastante importante: sólo dispone de 4 cores. Gracias a StarCluster pudimos montar un cluster con varias máquinas de manera rápida lo que nos proporcionaba el uso de una cantidad mayor de cores. Como se ve en la gráfica de tiempos (figura \ref{fig:time}) en los cluster pudimos lanzar más procesos de manera paralela por eso el tiempo se acaba mejorando con respecto al tiempo conseguido en la máquina local. Una cosa que también se ve en la gráfica es que el tiempo de ejecución parece estabilizarse. Eso se explica mediante la ley de Amdahl\footnote{Ley de Amdahl: \url{http://es.wikipedia.org/wiki/Ley_de_Amdahl}} porque sólo mejoramos el tiempo de cómputo y no el tiempo de comunicación entre procesos una cosa que se puede ver perfectamente en las gráficas de eficiencia y \emph{Speedup} (figuras \ref{fig:eficiencia} y \ref{fig:speedup} respectivamente).
+	A pesar de que con pocos procesos la máquina local es más rápida, tiene una limitación bastante importante: sólo dispone de 4 cores. Gracias a StarCluster pudimos montar un cluster con varias máquinas de manera rápida lo que nos proporcionaba el uso de una cantidad mayor de cores. Como se ve en la gráfica de tiempos (figura \ref{fig:time}), en los cluster pudimos lanzar más procesos de manera paralela, por eso el tiempo se acaba mejorando con respecto al tiempo conseguido en la máquina local. Una cosa que también se ve en la gráfica es que el tiempo de ejecución parece estabilizarse. Eso se explica mediante la ley de Amdahl\footnote{Ley de Amdahl: \url{http://es.wikipedia.org/wiki/Ley_de_Amdahl}} porque sólo mejoramos el tiempo de cómputo y no el tiempo de comunicación entre procesos, una cosa que se puede ver perfectamente en las gráficas de eficiencia y \emph{Speedup} (figuras \ref{fig:eficiencia} y \ref{fig:speedup} respectivamente).
 
 
 \begin{figure}[h]
@@ -1170,9 +1170,9 @@ Lo que nos índica el mensaje es que la clave que se ha indicado en el archivo d
   \label{fig:eficiencia}
 \end{figure}
 
-	Si nos fijamos en la gráficas de la eficiencia podemos ver que hasta los 20 procesos la eficiencia en las instancias optimizadas para cálculo están muy cerca de la situación ideal esto se debe a que son las que Amazon te ofrece para HPC\cite{AmazonHPC}. Sin embargo para las instancias dedicadas para propósito general se ve una cosa que a priori es extraña. Esta situación en la que varía tanto la eficiencia se debe principalmente a que no podemos asegurar de que el procesador de la máquina física sólo lo estemos ejecutando nosotros.
+	Si nos fijamos en las gráficas de la eficiencia, podemos ver que hasta los 20 procesos la eficiencia en las instancias optimizadas para cálculo están muy cerca de la situación ideal, esto se debe a que son las que Amazon te ofrece para HPC\cite{AmazonHPC}. Sin embargo, para las instancias dedicadas para propósito general se ve una cosa que a priori es extraña. Esta situación en la que varía tanto la eficiencia se debe principalmente a que no podemos estar seguros de que el procesador de la máquina física sólo lo estemos usando nosotros.
 	
-	Con esto podemos concluir que para pocos problemas y pequeños lo recomendable es ejecutarlos en una máquina en local, pero para problemas paralelizables que necesiten mucho computo (o para una gran cantidad e programas) compensa el uso de un cluster de computación como el que se puede crear con la herramienta de StarCluster. Además es más recomendable usar las instancias optimizadas para cálculo en lugar de las de propósito general aunque las primeras sean más caras\footnote{Precio de las instancias: \url{http://aws.amazon.com/ec2/pricing/\#On-Demand\_Instances}} .
+	Con esto podemos concluir que, para pocos problemas y pequeños lo recomendable es ejecutarlos en una máquina en local, pero para problemas paralelizables que necesiten mucho computo (o para una gran cantidad de programas) compensa el uso de un cluster de computación como el que se puede crear con la herramienta de StarCluster. Además, es más recomendable usar las instancias optimizadas para cálculo, en lugar de las de propósito general, aunque las primeras sean más caras\footnote{Precio de las instancias: \url{http://aws.amazon.com/ec2/pricing/\#On-Demand\_Instances}} .
 
 \clearpage
 {\setlength{\parskip}{0mm} \listoftables } % Para que no ponga espacios entre las lineas de indice
